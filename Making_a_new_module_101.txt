@@ -1,0 +1,62 @@
+step one: 
+create a folder for the module
+
+---
+
+step two: 
+in that folder you MUST have at least theese two files:
+__init__.py  - this tells python that the folder contains modules to be loaded
+commands.txt - this allows loabis to read modules from the file
+
+---
+
+step three: 
+create functions! nothing specific, this is literally whatever you want to do!
+
+---
+
+step four: 
+append functions to commands.txt. they must be in the folowing format:
+["text to call function"] :["name of function"],["short description of function"]
+
+["text to call function"] - the thing the user will type into the thingy to call the function - MUST HAVE A SPACE AFTER THIS, BUT BEFORE THE COLON
+["name of function"] - the actual name of the function in the code, allows the code to call the function
+["short description"] - tells the user what the function does when they ask for help
+
+ie: 
+"help :showhelp,displays a quick overview of what functions are available"
+
+---
+
+step five:
+add in whatever other things are needed by the module
+
+---
+
+step six:
+if more modules are required than are installed by default (ie: wolframalpha api is not a pure python module) append the following code to the module to tell the program to try and use it:
+
+the code:
+
+if module.checkmodule(["pipname of the module"],["VPA module name"]) == True:
+    import ["module"]
+
+["pipname of the module"]	 - the name you would type into the cmd to install the module using pip: 	i.e.: "SpeechRecognition"
+["module"] 			- the name you would type into the oython editor to load te python module: 	i.e.: "import speech_recognition"
+["VPA module name"] 		- the name of the VPA module this is inside of: 				i.e.: "betterui"
+
+for example:
+
+if module.checkmodule("SpeechRecognition","betterui") == True:
+    import speech_recognition as sr
+
+--
+
+step seven:
+finally, add to __init__.py whatever the module needs to do when it is initialised: for example check whether a pip module exists
+
+---
+
+step eight:
+place the folder containing the module in the main directory, the same as another module labeled "core".
+DO NOT EVER REMOVE, MODIFY OR TAMPER WITH EITHER THE CORE FOLDER, ITS CONTENTS NOR LOABIS.PY - THEESE ARE REQUIRED FOR THE USUAL FUNCTION OF THE PROGRAM
