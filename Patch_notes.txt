@@ -1,0 +1,85 @@
+0.1.51:
+Fixed a load of bugs with the new updater program. It should now ~work as expected.
+Not a lot else, ^ that took a lot of time and effort.
+very slight adjustments to _core, nothing particularly noticeable (modified _core.modules to work with the updater)
+
+0.1.50: -The big Updater Update-
+Updater program supplied with program to allow automatic instalation and updating of software.
+Custom modules will now be able to call other modules as dependencies.
+All modules must now state their version, in order to be compatible with the updater.
+Modules added to updater repository to allow them to be installed by the updater.
+Multiple copies of the program can exist on one machine, and can be launched from the updater.
+Updater Logs data to the log.
+Program versions now hosted on Dropbox: https://www.dropbox.com/sh/yucoglcwxirfkoq/AAATgGPh961ept6AHtWN8CyFa?dl=0
+Users can now install and run older versions, either from the dropbox, or from the updater.
+Opened Custom module creation to people outside of the development team.
+UI under development, prototype in use for the updater.
+Some minor tweaks to program to allow compatability with new software.
+Minor optimisation fixes.
+
+0.1.41:
+Reminders module complete and integrated into program.
+fixed small bug with _core.module overwriting previous functions.
+slight modifications to _core.
+optimisation of reminders module.
+
+0.1.40:
+Reminders module to be bundeled with next update.
+_core.module now allows custom functions to replace previous functions functionality.
+revisitation of loading function for smoother and less buggy load.
+Log shows time elapsed between importing modules and startup.
+Patch notes now bundeled with program (as opposed to developers only)
+Optimisation.
+
+0.1.31:
+Queries module now bundeled with Program.
+Load time reduced to 20 seconds at most.
+Program should now log important details.
+
+0.1.30:
+Program will now download any missing dependancies for default python modules.
+Fixed ongoing issue with porgram not importing commands from modules.
+Minor bug fixes.
+Optimisation.
+
+0.1.23:
+Fixed An issue with import order that caused core modules to be loaded in incorrect orders.
+Added in python module checks to stop program running if the modules aren't installed.
+Created guide for adding custom modules.
+Cleaned up redundant code.
+
+0.1.20:
+Added ability for program to load custom modules.
+Added settings module to allow for global variables.
+Added command reading from modules into program.
+Fixed error which prevented program from loading.
+
+0.1.00:
+Program is now modular.
+Expanded development team to include Luke Skinner.
+Filesize reduced Dramatically
+Experimental features (dictation, text-to-speech, solve math) removed.
+First alpha released with the expanded development team.
+Optimisation.
+
+0.0.3:
+Initial development restarted.
+Program is now not ine huge chunk of code.
+Program ca actually do stuff and is somewhat readable.
+Really buggy stuff that basically never worked renamed to "experimental features".
+
+0.0.2:
+Program now backs itself up.
+Program restores itself if tampered with without development passcode inputted.
+Data moved to textfile to allow storage on a multi-time use.
+
+0.0.1:
+Initial creation.
+Barebones framework.
+Development name LOaBIS created. (Local Operations and Basic Intelligence System)
+
+0.0.05:
+Program can read files.
+Program can save files.
+Program can rename files.
+(Literally nothing in this thing)

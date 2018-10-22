@@ -1,0 +1,143 @@
+step one: 
+create a folder for the module
+
+---
+
+step two: 
+in that folder you MUST have at least theese two files:
+__init__.py  - this tells python that the folder contains modules to be loaded
+commands.txt - this allows loabis to read modules from the file
+
+---
+
+step three: 
+create functions! nothing specific, this is literally whatever you want to do!
+
+---
+
+step four: 
+append functions to commands.txt. they must be in the folowing format:
+["text to call function"] :["name of function"],["short description of function"]
+
+["text to call function"] - the thing the user will type into the thingy to call the function - MUST HAVE A SPACE AFTER THIS, BUT BEFORE THE COLON
+["name of function"] - the actual name of the function in the code, allows the code to call the function
+["short description"] - tells the user what the function does when they ask for help
+
+ie: 
+"help :showhelp,displays a quick overview of what functions are available"
+
+---
+
+step five:
+add in whatever other things are needed by the module
+
+---
+
+step six:
+if more modules are required than are installed by default (ie: wolframalpha api is not a pure python module) append the following code to the module to tell the program to try and use it:
+
+the code:
+
+if module.checkmodule(["pipname of the module"],["VPA module name"]) == True:
+    import ["module"]
+
+["pipname of the module"]	 - the name you would type into the cmd to install the module using pip: 	i.e.: "SpeechRecognition"
+["module"] 			- the name you would type into the oython editor to load te python module: 	i.e.: "import speech_recognition"
+["VPA module name"] 		- the name of the VPA module this is inside of: 				i.e.: "betterui"
+
+for example:
+
+if module.checkmodule("SpeechRecognition","betterui") == True:
+    import speech_recognition as sr
+
+--
+
+step seven:
+add to __init__.py whatever the module needs to do when it is initialised: for example check whether a pip module exists, or replace a previous function
+
+If a module replaces a function in another module, ensure it is loaded afterwards (see step eight) and append the following code to the module:
+module.replacefunction(["VPA module name"],["function name"],["local replacement function"])
+
+["VPA module name"] 		- the name of the module the function being replaced is from			i.e.: "_core"
+["function name"] 		- the name of the function that is being replaced				i.e.: "say"
+["local replacement function"]	- the name of the local function that will replace the previous function	i.e.: "tell"
+
+for example:
+
+module.replacefunction("_core","say","tell")
+
+(^This will replace the _core module "say" with the local function "tell")
+
+---
+
+step eight:
+add any dependancies for the module to the __init__.py using the following code:
+module.needsdependancies(["VPA module name"],[["Required module"],["Required module2"],...])
+
+["VPA module name"] 		- the name of the module the requirement is needed for				i.e.: "system"
+["Required module"]		- the names of the modules that are required					i.e.: "_core"
+
+for example:
+
+module.needsdependancies("system",["_core","Reminders"])
+
+---
+
+step nine: (Optional, Only for if you want the modules to automatically be updated)
+If there are any local files that shouldn't be overwritten, Add the following code to the top of the __init__.py file:
+module.dont_overwrite(["List of modules that shouldn't be overwritten"]):
+
+It is very important that all of the files are named correctly, and that they are within a list format.
+
+ie:
+
+module.dont_overwite(["test.txt","reminders.txt","newfile.txt"])
+
+---
+
+step ten: (Optional, Only for if you want the modules to automatically be updated)
+Add the required VPA version to the top of __init__.py, this will allow the updater to update and maintain any future updates of the module.
+module.modversion(["VPA module name"],["VPA version"],["module installation url"])
+
+["VPA module name"] 		- the name of the module whose version is to be checked				i.e.: "system"
+["VPA version"]			- the required VPA version for the module					i.e.: "0.1.40"
+["module installation url"]	- the url where the module zip file may be installed from			i.e.: "https://drive.google.com/reminders/reminders0_1_40.zip"
+
+for example:
+
+module.modversion("reminders","0.1.40","https://drive.google.com/reminders/reminders0_1_40.zip")
+
+--Note--
+The url is required for the updater program, modules will not actually be updated at startup.
+Ensure correct file heirarchy to allow the updater program to identify versions:
+ie:
+-Reminders
+  |- 0.1.41
+  |- 0.1.40
+  |- 0.1.33
+  etc...
+
+---
+
+step eleven: (Optional, Only for if you want the modules to automatically be updated)
+Add the module to the updater program repositry by contacting the current person maintaining the thread, and sending them the name of your module, and the file link to its folder repository.
+ie:
+'could you add my module, queries, which is at "https://drive.google.com/queries/"'
+
+---
+
+step twelve: (Optional, Only for if you want the modules to automatically be updated)
+Ensure the correct naming of the zipfile archves in the online repository to allow the updater to more easily retrieve data.
+Ie:
+
+-Queries
+  |- 0.1.41.zip
+  |- 0.1.40.zip
+  |- 0.1.31.zip
+  etc...
+
+---
+
+step thirteen:
+place the folder containing the module in the main directory, the same as another module labeled "_core".
+DO NOT EVER REMOVE, MODIFY OR TAMPER WITH EITHER THE CORE FOLDER, ITS CONTENTS NOR LOABIS.PY - THEESE ARE REQUIRED FOR THE USUAL FUNCTION OF THE PROGRAM
