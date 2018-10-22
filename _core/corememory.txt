@@ -1,8 +1,8 @@
 version number
-0.1.31
+0.1.4
 developer
 Jack Lloyd-Walters
- Luke Skinner
+Luke Skinner
 software name
 Local Operations and Basic Intelligence System
 backup
@@ -21,6 +21,11 @@ def getcom(text=""):
     if x != "goodbye":
         interface()
 
+def _say(text=""):
+    for x in str(text)+"\n":
+        sys.stdout.write(x)
+        sleep(0.003)
+
 def interface():
     say("\nWhat would you like me to do?")
     text = listen("> ")
@@ -33,17 +38,18 @@ def logtext(text="null"):
     y.close()
 
 if __name__ == "__main__":
+    start_time = datetime.datetime.now()
     logtext("Initialising")
     modules = next(os.walk(os.getcwd()))[1]
     modules.sort()
-    
+
     if "__pycache__" in modules:
         modules.pop(modules.index("__pycache__"))
-        
+
     for x in modules:
         exec("from "+str(x)+" import *")
     logtext("Modules found: "+str(modules))
-        
+
     from _core import settings
     settings.addglobal("funcs",[])
     settings.addglobal("cwords",[])
@@ -51,7 +57,8 @@ if __name__ == "__main__":
 
     startup()
 
-    say("Importing functions:")
+    _say("Importing functions:")
+    import_start = datetime.datetime.now()
     for x in modules:
         if not x in settings.dont_inst:
             try:
@@ -72,9 +79,14 @@ if __name__ == "__main__":
                 pass
         else:
             pass
+    import_time = divmod((datetime.datetime.now()-import_start).total_seconds(), 60)
+    logtext("All function imported, took "+str(import_time[0]*60+import_time[1])+" seconds")
     settings.funcs.append("null")
     settings.cwords.append("null ")
     settings.desc.append("a null function")
-    say("All found functions have been succesfully imported")
+    _say("All found functions have been succesfully imported")
+
+    elapsed_time = divmod((datetime.datetime.now()-start_time).total_seconds(), 60)
+    logtext("Import successfull, took "+str(elapsed_time[0]*60+elapsed_time[1])+" seconds")
 
     interface()

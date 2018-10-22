@@ -21,7 +21,7 @@ def logtext(text="null"):
     y = open("log.txt","a")
     y.write("["+str(datetime.datetime.now())+"] - "+text)
     y.close()
-    
+
 def installmodule(mod=""):
     print("Installing module: "+mod+" Please wait a moment")
     logtext("module: "+mod+" not installed, installing now")
@@ -57,6 +57,13 @@ def stopmodule(core="",mod=""):
         logtext("No module: "+mod+" has prevented loading of functions: "+a)
     except:
         pass
+
+def replacefunction(core="",mod="",new_mod=""):
+    if hasattr(globals()[core],mod):
+        setattr(globals()[core],mod,new_mod)
+        return True
+    else:
+        return False
 
 if __name__ != "__main__":
     init()

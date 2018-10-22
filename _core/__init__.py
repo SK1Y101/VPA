@@ -3,7 +3,7 @@ from time import sleep
 
 def startup():
     from _core import settings,module
-    say("\n-- | Inintialising Startup Procedure | --")
+    _say("\n-- | Inintialising Startup Procedure | --")
     try:
         settings.addglobal("user",str(os.getlogin()[0].upper()+os.getlogin()[1:len(os.getlogin())]),True)
     except:
@@ -27,14 +27,14 @@ def startup():
         settings.dont_inst = x
     except:
         module.init()
-        
+
     readmemory()
     checkbackup()
     software = settings.software
     version = settings.version
-    say("-- | startup completed succesfully | --\n-- Initialising at time: "+str(datetime.datetime.now())+" --\n"+software+" "+version+"\n")
+    _say("-- | startup completed succesfully | --\n-- Initialising at time: "+str(datetime.datetime.now())+" --\n"+software+" "+version+"\n")
     logtext("starting "+software+" version "+version)
-    
+
 def logtext(text="null"):
     text = text[0].upper()+text[1:len(text)]+"\n"
     y = open("log.txt","a")
@@ -45,55 +45,55 @@ def checkbackup():
     logtext("Checking backup")
     self = settings.self
     mem = settings.mem
-    say("-- Checking Core --")
+    _say("-- Checking Core --")
     f = open("_core/corememory.txt","r")
     m = f.read()
     f.close()
     codecore = m[m.index("backup")+7:len(m)]
-    say("-- Comparing Core with backup --")
+    _say("-- Comparing Core with backup --")
     f = open(self,"r")
     me = f.read()
     f.close()
     if me != codecore:
         logtext("Core modified, requesting pass")
-        if listen("Core pass required:\n> ") !=settings.corepass:
+        if _listen("Core pass required:\n> ") !=settings.corepass:
             say("-- Restoring Core --")
             f = open(self,"w")
             f.write(codecore)
             f.close()
-            say("-- Core Restored to backup version --")
+            _say("-- Core Restored to backup version --")
             logtext("Core restored to backup")
             sys.exit()
         else:
-            say("-- Manual overwrite of Core --")
+            _say("-- Manual overwrite of Core --")
             logtext("core overwritten")
             writebackup()
     else:
-        say("-- No errors encountered --")
+        _say("-- No errors encountered --")
         logtext("Core backup check complete")
 
 def writebackup():
     logtext("Writing core backup")
     mem = settings.mem
     self = settings.self
-    say("-- Reading self --")
+    _say("-- Reading self --")
     f = open(self,"r")
     m = f.read()
     f.close()
     t = mem.index("backup")
     mem = mem[0:t+1]
     mem.append(str(m)[0:len(str(m))-1])
-    say("-- Preparing Core for backup --")
+    _say("-- Preparing Core for backup --")
     f = open("_core/corememory.txt","w")
     for x in mem:
         f.write(str(x)+"\n")
     f.close()
-    say("-- Core backup complete --")
+    _say("-- Core backup complete --")
     logtext("core backup complete")
 
 def readmemory():
     logtext("Reading memory")
-    say("-- Initialising memory retrieval --")
+    _say("-- Initialising memory retrieval --")
     f = open("_core/corememory.txt","r")
     file = csv.reader(f)
     mem = []
@@ -101,7 +101,7 @@ def readmemory():
         mem = mem+row
     settings.addglobal("mem",mem,True)
     f.close()
-    say("-- memory retrieval complete --")
+    _say("-- memory retrieval complete --")
     settings.software = str(mem[mem.index("software name")+1])
     settings.version = str(mem[mem.index("version number")+1])
     try:
@@ -109,11 +109,23 @@ def readmemory():
     except:
         user = "User"
     logtext("Memory loaded")
-    
+
+def _say(text=""):
+    for x in str(text)+"\n":
+        sys.stdout.write(x)
+        sleep(0.003)
+
 def say(text=""):
     for x in str(text)+"\n":
         sys.stdout.write(x)
         sleep(0.003)
+
+def _listen(text=""):
+    for x in str(text):
+        sys.stdout.write(x)
+        sleep(0.003)
+    text = input()
+    return text
 
 def listen(text=""):
     for x in str(text):

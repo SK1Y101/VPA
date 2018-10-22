@@ -1,21 +1,21 @@
-step one: 
+step one:
 create a folder for the module
 
 ---
 
-step two: 
+step two:
 in that folder you MUST have at least theese two files:
 __init__.py  - this tells python that the folder contains modules to be loaded
 commands.txt - this allows loabis to read modules from the file
 
 ---
 
-step three: 
+step three:
 create functions! nothing specific, this is literally whatever you want to do!
 
 ---
 
-step four: 
+step four:
 append functions to commands.txt. they must be in the folowing format:
 ["text to call function"] :["name of function"],["short description of function"]
 
@@ -23,7 +23,7 @@ append functions to commands.txt. they must be in the folowing format:
 ["name of function"] - the actual name of the function in the code, allows the code to call the function
 ["short description"] - tells the user what the function does when they ask for help
 
-ie: 
+ie:
 "help :showhelp,displays a quick overview of what functions are available"
 
 ---
@@ -53,7 +53,20 @@ if module.checkmodule("SpeechRecognition","betterui") == True:
 --
 
 step seven:
-finally, add to __init__.py whatever the module needs to do when it is initialised: for example check whether a pip module exists
+finally, add to __init__.py whatever the module needs to do when it is initialised: for example check whether a pip module exists, or replace a previous function
+
+If a module replaces a function in another module, ensure it is loaded afterwards and append the following code to the module:
+module.replacefunction(["VPA module name"],["function name"],["local replacement function"])
+
+["VPA module name"] 		- the name of the module the function being replaced is from			i.e.: "_core"
+["function name"] 		- the name of the function that is being replaced				i.e.: "say"
+["local replacement function"]	- the name of the local function that will replace the previous function	i.e.: "tell"
+
+for example:
+
+module.replacefunction("_core","say","tell")
+
+(^This will replace the _core module "say" with the local function "tell")
 
 ---
 
