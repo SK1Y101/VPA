@@ -1,4 +1,10 @@
-0.1.4:
+0.1.41:
+Reminders module complete and integrated into program.
+fixed small bug with _core.module overwriting previous functions.
+slight modifications to _core.
+optimisation of reminders module.
+
+0.1.40:
 Reminders module to be bundeled with next update.
 _core.module now allows custom functions to replace previous functions functionality.
 revisitation of loading function for smoother and less buggy load.

@@ -1,4 +1,5 @@
 def init():
+    globals()["reminders"] = []
     globals()["dont_inst"] = []
     globals()["modules"] = ['pip', 'requests', 'setuptools', 'virtualenv']
     globals()["version"] = ""
