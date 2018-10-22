@@ -1,4 +1,0 @@
-search :search,query info
-what are :search,query info
-what is :search,query info
-google :googlesearch,open a google search for a query

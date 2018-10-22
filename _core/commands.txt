@@ -1,4 +1,0 @@
-goodbye :goodbye,shut the program down
-exit :goodbye,exit the program
-quit :goodbye,exit the program
-help :showhelp,displays a quick overview of what functions are available
