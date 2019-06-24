@@ -3,7 +3,7 @@ from . import module
 from time import sleep
 
 def main():
-    module.module("_core","0.2.05","N/A")
+    module.module("_core","0.2.06","N/A")
     module.startup([checkbackup])
 
 def init():
@@ -85,7 +85,7 @@ def getmodinfo(module=""):
         m=f.read()
         f.close()
         name,ver,url=m.split("module.module(")[1].split(")")[0].replace('"',"").split(",")
-        mods,startup,persist,depend,shutdown,old,new=[],[],[],[],[],[],[]
+        mods,startup,pstartup,persist,depend,shutdown,old,new=[],[],[],[],[],[],[],[]
         try:
             if not name=="_core":
                 mods=m.split("module.needs([")[1].split("])")[0].replace('"',"").split(",")
@@ -97,14 +97,26 @@ def getmodinfo(module=""):
         except:
             depend=[]
         try:
-            startup=m.split("module.startup([")[1].split("])")[0].replace('"',"").split(",")
-        except:
-            startup=[]
-        try:
             if not name=="_core":
-                persist=m.split("module.persist([")[1].split("])")[0].replace('"',"").split(",")
+                persist=m.split("module.persist([")[1].split("])")[0].replace('"',"").slpit(".")
         except:
             persist=[]
+        try:
+            _startup=m.split("module.startup([")[1].split("])")[0].replace('"',"")
+            if "]" not in _startup:
+                startup=_startup.split(",")
+            else:
+                a,b=_startup.split("],[")
+                c,d=[],[]
+                for x in range(len(a)):
+                    if (b[x]==0) or (b[x]==2):
+                        c.append(a[x])
+                    if (b[x]==1) or (b[x]==2):
+                        d.append(a[x])
+                startup+=c
+                pstartup+=d
+        except:
+            startup=[]
         try:
             if not name=="_core":
                 shutdown=+m.split("module.shutdown([")[1].split("])")[0].replace('"',"").split(",")
@@ -117,7 +129,7 @@ def getmodinfo(module=""):
         except:
             old,new=[],[]
 
-        return name,ver,url,mods,depend,startup,persist,shutdown,old,new
+        return name,ver,url,mods,depend,startup,persist,shutdown,old,new,pstartup
     except:
         return module,"0.0.00","None",[],[],[],[],[],[],[]
 

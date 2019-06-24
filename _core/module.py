@@ -4,6 +4,7 @@ globals()["funcs"] = []
 globals()["cwords"] = []
 globals()["desc"] = []
 globals()["startfunc"] = []
+globals()["pstartfunc"] = []
 globals()["persistfunc"] = []
 globals()["permods"] = []
 globals()["shutdownfunc"] = []
@@ -26,11 +27,11 @@ def needs(modules=[]):
     -tells LOaBIS to check for, and download wolframalpha and six, if they are not on the host machine'''
     return True
 
-def startup(funcs=[]):
+def startup(funcs=[],modifier=[]):
     '''used to set a list of functions that must be performed at launch
     (always a list, even if there is only one requirement.)
     ie:
-    startup([loadreminders])
+    startup([loadreminders],[0])
     -tells LOaBIS to run loadreminders on startup'''
     return True
 
@@ -72,6 +73,22 @@ def replacefunction(funcs=[],replacement=[]):
     ie:
     replacefunction([say,listen],[speak,hear])
     -replaces the functions say and listen with speak and hear'''
+    return True
+
+def after_install(funcs=[]):
+    '''used to tell the updater to perform a specific function when the module is installed, typically used for setup purposes
+    (always a list, even if it has only a single index)
+    ie:
+    after_install([setupusers])
+    -runs 'setupusers' once the updater nstalls the module'''
+    return True
+
+def after_update(funcs=[]):
+    '''used to tell the updater to perform a specific function when the module is updated, typically used for setup purposes
+    (always a list, even if it has only a single index)
+    ie:
+    after_update([checktext])
+    -runs 'checktext' once the updater updates the module'''
     return True
 
 def _logtext(text="null"):

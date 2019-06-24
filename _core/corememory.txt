@@ -31,7 +31,7 @@ a)
 def _startpers():
     import socket
     perpas="version:"+corever+"#"
-    for x in modules+[":"]+module.persistfunc:
+    for x in modules+[":"]+module.persistfunc+[":"]+module.pstartfunc:
         perpas+=x+";"
     pers=threading.Thread(name="Persistent functions"
 target=lambda:subprocess.call(["python"
@@ -178,8 +178,10 @@ r)
 b=[0
 0
 0
+0
 0]
 [0
+0
 0
 0
 0]
@@ -196,11 +198,13 @@ _closepers]
 end
 persist
 old
-new=z[5]
+new
+pstartup=z[5]
 z[7]
 z[6]
 z[8]
 z[9]
+z[10]
             if start:
                 b[0]+=1
                 for y in start:
@@ -216,6 +220,11 @@ z[9]
                 for y in persist:
                     a[2]+=1
                     module.persistfunc.append(y)
+            if pstartup:
+                b[4]+=1
+                for y in pstartup:
+                    a[4]+=1
+                    module.pstartfunc.append(y)
             if old:
                 b[3]+=1
                 for y in range(len(old)):
@@ -227,6 +236,7 @@ z[9]
         _logtext(str(a[0])+" Startup functions loaded from "+str(b[0])+" modules")
         _logtext(str(a[1])+" shutdown functions loaded from "+str(b[1])+" modules")
         _logtext(str(a[2])+" persistent functions loaded from "+str(b[2])+" modules")
+        _logtext(str(a[4])+" persistent startups loaded from "+str(b[4])+" modules")
         _logtext(str(a[3])+" replacement functions loaded from "+str(b[3])+" modules")
         if module.startfunc:
             _logtext("Executing "+str(len(module.startfunc))+" Startup functions; "+str(module.startfunc))

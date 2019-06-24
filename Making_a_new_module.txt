@@ -105,24 +105,43 @@ add to the setup() function, in the same way that module.module was added, any o
 	module.replacefunction([say,listen],[speak,hear])
 	(replaces say and listen with speak and hear)
 
-4) functions to be executed on program shutdown, startup, or at regular intervals:
+4) functions to be executed on program startup:
 	start:		module.startup([{"function 1/2/etc..."}])
+		(To be used if the function will be startup up when LOaBIS does)
+	-or-
+	start:		module.startup([{"function 1/2/etc..."}],[{"modifier 1/2/etc"}])
+		(To be used if the function needs to be startup in the persistent thread)
+
+	Information:
+	{"function 1/2/etc..."}		- The function(s) that (is/are) to be executed at startup
+	{"modifier 1/2/etc..."}		- a number, either 0,1,or 2, telling the program how to execute the function:
+						0) the function will only be executed in the LOaBIS Startup
+						1) the function will only be executed in the persistent thread Startup
+						2) the function will be executed in both the persistent and LOaBIS startup
+	
+	Ie:
+	module.startup([getdata])			-one function starting in LOaBIS
+	module.startup([loaduitools,launchui])		-multiple functions starting in LOaBIS
+	-or-
+	module.startup([getdata],[0])			-one function starting in LOaBIS only (Same behaviour as the first example)
+	module.startup([getdata],[2])			-one function starting in both LOaBIS and persistent
+	module.startup([loaduitools,launchui],[2,1])	-multiple functions, where loaduitools starts in LOaBIS and persistent, but launchui only starts in persistent
+	
+5) functions to be executed on program shutdown, or at regular intervals:
 	shutdown:	module.shutdown([{"function 1/2/etc..."}])
 	persistent:	module.persist([{"function 1/2/etc..."}])
 
 	Information:
-	{"function 1/2/etc..."}		- The function(s) that (is/are) to be executed at startup, shutdown, or persistently
+	{"function 1/2/etc..."}		- The function(s) that (is/are) to be executed at shutdown, or persistently
 
 	Ie:
-	module.startup([getdata])
 	module.shutdown([savedata])
 	-or- (in the event of multiple)
-	module.startup([loaduitools,launchui])
 	module.persist([fetchmessages,typeup])
 
 	*NOTE*	The persist function will execute at regular intervals (typically 30 minutes), There is currently no alternative to this bar creating your own.
 
-5) Local files that are to be retained when updating the module version using the updater program:
+6) Local files that are to be retained when updating the module version using the updater program:
 	module.dont_overwrite([{"file 1/2/etc..."}])
 
 	Information:
@@ -207,8 +226,8 @@ The metadata file should include, in any prefered order:
 
 The changelog file should contain:
 	{"Module version"}:	-	{"Optional Update name"}
-	minversion:{"Minimum working version"}
-	maxversion:{"Maximum working version"}
+	minver:{"Minimum working version"}
+	maxver:{"Maximum working version"}
 	required:{"Required Modules"}
 	{"Aditional details"}
 

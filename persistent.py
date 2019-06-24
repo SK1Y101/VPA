@@ -1,6 +1,7 @@
 import sys,time,socket,threading,datetime,os
 globals()["arg"],globals()["closed"]=str(sys.argv).split("version:")[1],0
 globals()["corever"],globals()["arg"]=arg.split("#")
+globals()["wait_time"]=30
 
 def main():
     from _core import _say
@@ -8,7 +9,7 @@ def main():
     _logpers("Initialising Persistence module")
     os.system("title LOaBIS v"+str(corever)+" - Persistence module")
     passed = str(arg[1:]).replace("['","").replace("']","")
-    modules,functions=passed.split(":")[0].split(";")[0:-1],passed.split(":")[1].split(";")[1:-1]
+    modules,functions,startup=passed.split(":")[0].split(";")[0:-1],passed.split(":")[1].split(";")[1:-1],passed.split(":")[2].split(";")[1:-1]
     _logpers("Functions loaded from modules")
     for x in modules:
         exec("from "+str(x).replace("core","_core")+" import *")
@@ -16,10 +17,17 @@ def main():
     globals()["main_program"],t=start_client(multiply("LOaBIS")),0
     t1=threading.Thread(name="checkclose",target=getclosed)
     t1.start()
+    _logpers("Executing startup")
+    _say("Initialisation of startup functions\n")
+    for x in startup:
+        try:
+            globals()[str(x)]()
+        except Exception as e:
+            _logtext("Could not perform startup function: "+str(x)+"\nError: "+str(type(e))+"; "+str(e))
     _logpers("Executing main loop")
     _say("Initialisation finalising, executing main program\n")
     while closed!=1:
-        if int(datetime.datetime.now().minute)%2==0:
+        if int(datetime.datetime.now().minute)%wait_time==0:
             if datetime.datetime.now().second==0:
                 t=1
         if t==1:

@@ -341,7 +341,7 @@ def loadoldmod(main="",name=""):
         main.destroy()
         name,screenname,author,description,homepage=checklist(getmeta(moduledir+"metadata.txt"),[name,name,"N/A","N/A","N/A"])
         modulever=getactualver(Focus_Dir[2],Focus_Dir[1],str(name))
-        a,b=["commands.txt","__init__.py","metadata.txt","changelog.txt"],["",'def setup():\n    module.module("'+str(name)+'","'+str(modulever)+'","N/A")\n\n','name:'+str(name)+'\nscreenname:'+str(screenname)+'\nauthor:'+str(author)+'\ndescription:'+str(description)+'\nhomepage:'+str(homepage),'0.0:\nminversion:'+str(min(modulever,Focus_Dir[1]))+'\nmaxversion:'+str(max(modulever,Focus_Dir[1]))+'\nrequired:N/A']
+        a,b=["commands.txt","__init__.py","metadata.txt","changelog.txt"],["",'def setup():\n    module.module("'+str(name)+'","'+str(modulever)+'","N/A")\n\n','name:'+str(name)+'\nscreenname:'+str(screenname)+'\nauthor:'+str(author)+'\ndescription:'+str(description)+'\nhomepage:'+str(homepage),'0.0:\nminver:'+str(min(modulever,Focus_Dir[1]))+'\nmaxver:'+str(max(modulever,Focus_Dir[1]))+'\nrequired:N/A']
         for x in range(len(a)):
             if not os.path.isfile(moduledir+a[x]):
                 with open(moduledir+a[x],"w") as f:
@@ -369,7 +369,7 @@ def createnewmod(main="",name="",screenname="",author="",description="",homepage
         main.destroy()
         moduledir=Focus_Dir[2].replace("LOaBIS.py",str(name)+sep)
         os.mkdir(moduledir)
-        a,b=["commands.txt","__init__.py","metadata.txt","changelog.txt"],["",'def setup():\n    module.module("'+str(name)+'","'+str(Focus_Dir[1])+'","N/A")\n\n','name:'+str(name)+'\nscreenname:'+str(screenname)+'\nauthor:'+str(author)+'\ndescription:'+str(description)+'\nhomepage:'+str(homepage),'0.0:\nminversion:'+str(Focus_Dir[1])+'\nmaxversion:'+str(Focus_Dir[1])+'\nrequired:N/A\nCreated the module']
+        a,b=["commands.txt","__init__.py","metadata.txt","changelog.txt"],["",'def setup():\n    module.module("'+str(name)+'","'+str(Focus_Dir[1])+'","N/A")\n\n','name:'+str(name)+'\nscreenname:'+str(screenname)+'\nauthor:'+str(author)+'\ndescription:'+str(description)+'\nhomepage:'+str(homepage),'0.0:\nminver:'+str(Focus_Dir[1])+'\nmaxver:'+str(Focus_Dir[1])+'\nrequired:N/A\nCreated the module']
         for x in range(len(a)):
             with open(moduledir+a[x],"w") as f:
                 f.write(b[x])
@@ -443,13 +443,14 @@ def addnewversion(main="",version="",maxv="",minv="",name="",req="",change=""):
         savemodulechanges(["__init__.py","commands.txt","metadata.txt","changelog.txt"],textboxinputs)
         if name:
             name=' - The "'+str(name)+'" update'
-        if (returnfromfile(module_dir+"changelog.txt","minversion:",enditem="\n",default=minv) != minv) or (returnfromfile(module_dir+"changelog.txt","maxversion:",enditem="\n",default=maxv) != maxv):
+        if (returnfromfile(module_dir+"changelog.txt","minver:",enditem="\n",default=minv) != minv) or (returnfromfile(module_dir+"changelog.txt","maxver:",enditem="\n",default=maxv) != maxv):
             if change!="":
                 change+="\n"
             change+="added compatability for new LOaBIS Version"
-        replaceinfile(module_dir+"changelog.txt","","",str(version)+":"+name+"\nminversrion:"+minv+"\nmaxversion:"+maxv+"\nrequired:"+req+"\n"+change+"\n\n")
+        replaceinfile(module_dir+"changelog.txt","","",str(version)+":"+name+"\nminver:"+minv+"\nmaxver:"+maxv+"\nrequired:"+req+"\n"+change+"\n\n")
         replaceinfile(module_dir+"__init__.py",'module.module("'+str(module_name)+'","',",",'module.module("'+str(module_name)+'","'+Focus_Dir[1]+'",')
         loadmodulechanges(["__init__.py","commands.txt","metadata.txt","changelog.txt"],textboxinputs)
+        popup("Complete","\nThe new version has been succesfully created!\n\nA formated zip file containing the release is in the same directory as the module wizard")
     else:
         popup("Error","\nPlease check that the details given are correct")
 
@@ -553,22 +554,37 @@ def quitwizard(main=""):
     from tkinter import messagebox
     if messagebox.askokcancel(title="Quit",default="cancel",icon="error",message="Are you sure you want to quit the wizard?\n\n(any changes will be lost)"):
         main.destroy()
+
 def getimportedmodules(path=""):
-    mods,funcs,docs=[module_name],[],[]
+    _logtext("Fetching imported modules")
+    mods,funcs,docs,igno,sub=[module_name],[],[],[],[]
     with open(path+"__init__.py","r") as f:
         m=f.read()
 
+    if "from " in m:
+        for x in m.split("from ")[1:]:
+            a=x.split("\n")[0]
+            #mods+=[a.split(" ")[0]+"."+a.split("import ")[1]]
+            igno+=[a.split("import ")[1]]
     if "import" in m:
         for x in m.split("import "):
             if "," in x:
                 mods+=x.split("\n")[0].replace(" ","").replace("from","").replace("*","").split(",")
+    for x in igno:
+        if x in mods:
+            mods.remove(x)
 
+    _logtext("Fetching functions from imported modules")
     for x in mods:
         a=dir()
-        try:
-            exec("from "+str(x)+" import *")
-        except:
-            exec("import "+str(x))
+        if "." in x:
+            exec("from "+x.split(".")[0]+" import "+x.split(".")[1])
+        else:
+            try:
+                exec("from "+str(x)+" import *")
+            except:
+                exec("import "+str(x))
+        mods[mods.index(x)]=x.split(".")[0]
         b=dir()
         c=b
         for y in a:
@@ -581,33 +597,99 @@ def getimportedmodules(path=""):
         for u in c:
             try:
                 try:
-                    _a.append(getattr(globals()[x],u).__doc__)
+                    _a.append(getattr(globals()[str(x)],str(u)).__doc__)
                 except:
                     exec("from "+x+" import "+u)
-                    _a.append(globals()[u].__doc__)
+                    _a.append(globals()[str(u)].__doc__)
             except:
                 _a.append("No DocString Available")
         funcs.append(c)
         docs.append(_a)
 
+    _logtext(str(len(mods))+" modules loaded with "+str(length(funcs))+" functions")
     return mods,funcs,docs
+
+def length(lst=[]):
+    lnt=0
+    for y in lst:
+        try:
+            if [str(y)]!=list(y):
+                lnt+=len(y)
+            else:
+                lnt+=1
+        except:
+            lnt+=1
+    return lnt
+
+def myfuncs(dire=""):
+    _logtext("getting module functions")
+    func,text,doc=[],[],[]
+    with open(dire+"__init__.py","r") as f:
+        m=f.read()
+    a=m.split("def ")[1:]
+    for x in a:
+        b="None"
+        func.append(x.split("(")[0])
+        text.append(x.split(":")[0])
+        if '"""' in x:
+            b=x.split('"""')[1]
+        doc.append(b)
+    return func,text,doc
 
 def change_modmod(*args):
     modfunctext.destroy()
     modfuncdrop.destroy()
-    globals()["modfunc"],globals()["modfunctext"],globals()["modfuncdrop"]=dropdown(functab,"Function",impfunc[impmod.index(modmod.get())][0],impfunc[impmod.index(modmod.get())],6,dropsticky="ew")
-    #modfunc.trace('w',change_modfunc)
+    try:
+        globals()["modfunc"],globals()["modfunctext"],globals()["modfuncdrop"]=dropdown(functab,"Function",impfunc[impmod.index(modmod.get())][0],impfunc[impmod.index(modmod.get())],6,dropsticky="ew")
+    except:
+        globals()["modfunc"],globals()["modfunctext"],globals()["modfuncdrop"]=dropdown(functab,"Function",["None found"],["None found"],6,dropsticky="ew")
+        #modfunc.trace('w',change_modfunc)
 
-'''def change_modfunc(*args):
+def simfunc(function=""):
+    import difflib
+    _f=[]
+    for x in impfunc:
+        for y in x:
+            _f.append(impmod[impfunc.index(x)]+"."+y)
+    a,b=sorted(_f, key=lambda x: difflib.SequenceMatcher(None, x.split(".")[1], function).ratio(), reverse=True),"The 10 most similar functions to:\n'"+str(function)+"' are:\n"
+    for x in a[0:10]:
+        b+="\n"+x
+    return b
+
+def insrt(txt="",text=""):
+    txt.insert(INSERT,str(text))
+
+def add_modfunc(txt):
+    from inspect import signature
     mod=impmod.index(modmod.get())
     func=impfunc[mod].index(modfunc.get())
-    print(impdoc[mod][func])'''
+    try:
+        _f=module_func[1][module_func[0].index(modfunc.get())]
+    except:
+        _f=str(modmod.get()+".").replace(module_name+".","")+str(impfunc[mod][func])
+        try:
+            try:
+                _f+=str(signature(getattr(globals()[str(modmod.get())],str(modfunc.get()))))
+            except:
+                _f+=str(signature(globals()[str(modfunc.get())]))
+        except:
+            _f+="()"
+    insrt(txt,str(_f))
+
+def makefunc(mods,coms,chan):
+    main=genwindow(title="Create a new function")
+    missing(main)
+
+def editfunc(mods,coms,chan):
+    main=genwindow(title="Edit a function")
+    missing(main)
 
 def mainwizard(name=""):
     _logtext("Launching main wizard")
     globals()["main"]=genwindow(title="Module wizard for:   "+remexcess(Focus_Dir[0])+" v"+str(Focus_Dir[1]),resize=False)
     globals()["module_name"]=str(name)
     globals()["module_dir"]=home_dir+sep+str(name)+sep
+    globals()["module_func"]=myfuncs(module_dir)
     globals()["tabr"]=Notebook(main)
     globals()["tabs"]=Notebook(main)
     globals()["impmod"],globals()["impfunc"],globals()["impdoc"]=getimportedmodules(module_dir)
@@ -615,29 +697,31 @@ def mainwizard(name=""):
 
     globals()["functab"],modtab,tab1,tab2,tab3,tab4=Frame(tabr),Frame(tabr),Frame(tabs),Frame(tabs),Frame(tabs),Frame(tabs)
     tabr.add(functab,text="Fuctions")
-    tabr.add(modtab,text="Modules")
+    tabr.add(modtab,text="Module")
     tabr.pack(fill="both",expand=True,padx=5,pady=5,side=LEFT)
     tabs.add(tab1,text="Main Module script")
     tabs.add(tab2,text="User commands list")
     tabs.add(tab3,text="Metadata")
     tabs.add(tab4,text="Changelog")
     tabs.pack(fill="both",expand=True,padx=5,pady=5)
+    
     #First tabs
     #tab 1
-    title=textlabel(functab,"Search functions:",0,0,gp=0)
+    title=textlabel(functab,"Search by name:",0,0,gp=0)
 
     funcsearchtext,funcsearchbox=enterbox(functab,"Search","",1,0)
-    funcseatch=Button(functab,text="Search",command=donothing).grid(row=2,column=1,padx=5,pady=5)
+    funcseatch=Button(functab,text="Search",command=lambda:popup("Search functions",simfunc(funcsearchbox.get()),padx=10,pady=10)).grid(row=2,column=1,padx=5,pady=5)
     seperator(functab,"H",3,0)
 
-    title=textlabel(functab,"Function by module:",4,0,gp=0)
+    title=textlabel(functab,"Search by module:",4,0,gp=0)
     globals()["modmod"]=dropdown(functab,"Module",impmod[0],impmod,5,dropsticky="ew")[0]
     modmod.trace('w',change_modmod)
     globals()["modfunc"],globals()["modfunctext"],globals()["modfuncdrop"]=dropdown(functab,"Function",impfunc[impmod.index(modmod.get())][0],impfunc[impmod.index(modmod.get())],6,dropsticky="ew")
-    funcinsert=Button(functab,text="Insert at cursor")
 
     seperator(functab,"H",8,0)
-    missing(functab,9,0,0,span=2)
+    title=textlabel(functab,"Creation:",9,0,gp=0)
+    createfunc=Button(functab,text="Create function",command=lambda:makefunc(mod_enter,coms_enter,change_enter)).grid(row=10,column=0,padx=5,pady=5)
+    editfunc=Button(functab,text="Edit function",command=donothing).grid(row=10,column=1,padx=5,pady=5)
 
     #tab 2
     missing(modtab)    
@@ -645,6 +729,7 @@ def mainwizard(name=""):
     #Second tabs
     #tab1
     mod_enter=setscrollbox(tab1,50,20,1,1,1,1,5,5,2)[0]
+    funcinsert=Button(functab,text="Insert at cursor",command=lambda:add_modfunc(mod_enter)).grid(row=7,column=1,padx=5,pady=5)
 
     #tab2
     coms_enter=setscrollbox(tab2,50,20,1,1,1,1,5,5,2)[0]

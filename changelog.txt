@@ -1,3 +1,14 @@
+0.2.06:
+minver:0.2.05
+maxver:0.2.06
+required:N/A
+added a modifier to the startup function, so as to allow it to happen in the persistent thread, the main interface, or both.
+Fixed a slight issue with the module wizard and updater, in which a slight difference in variables used dissalowed it to recognise the correct version for new modules
+still decided to keep "after install" in development. that stuff be buggy as heck.
+some more development on the module wizard, soon it'll be useable.
+the module wizard should now be capable of adding and searching for functions to the script, currently working on function creation.
+updated the LOaBIS changelog to use the correct version signing, as it had been unrecogniseable to the updater.
+
 0.2.05: -The "Fixing the huge bugs we somehow didn't notice while we built the foundations for even more bugs later" update.
 minver:0.2.05
 maxver:0.2.05

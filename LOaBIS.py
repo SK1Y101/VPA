@@ -13,7 +13,7 @@ def _logtext(text="null"):
 def _startpers():
     import socket
     perpas="version:"+corever+"#"
-    for x in modules+[":"]+module.persistfunc:
+    for x in modules+[":"]+module.persistfunc+[":"]+module.pstartfunc:
         perpas+=x+";"
     pers=threading.Thread(name="Persistent functions",target=lambda:subprocess.call(["python","persistent.py",perpas],creationflags=subprocess.CREATE_NEW_CONSOLE))
     pers.start()
@@ -141,11 +141,11 @@ if __name__=="__main__":
 
         _logtext("Retrieving modification functions")
         _say("Checking modification functions")
-        a,b=[0,0,0,0],[0,0,0,0]
+        a,b=[0,0,0,0,0],[0,0,0,0,0]
         offlimits=["getcom","_logtext","_say","checkbackup","writebackup","_startpers","_closepers"]
         for x in modules:
             z=getmodinfo(x)
-            start,end,persist,old,new=z[5],z[7],z[6],z[8],z[9]
+            start,end,persist,old,new,pstartup=z[5],z[7],z[6],z[8],z[9],z[10]
             if start:
                 b[0]+=1
                 for y in start:
@@ -161,6 +161,11 @@ if __name__=="__main__":
                 for y in persist:
                     a[2]+=1
                     module.persistfunc.append(y)
+            if pstartup:
+                b[4]+=1
+                for y in pstartup:
+                    a[4]+=1
+                    module.pstartfunc.append(y)
             if old:
                 b[3]+=1
                 for y in range(len(old)):
@@ -173,6 +178,7 @@ if __name__=="__main__":
         _logtext(str(a[0])+" Startup functions loaded from "+str(b[0])+" modules")
         _logtext(str(a[1])+" shutdown functions loaded from "+str(b[1])+" modules")
         _logtext(str(a[2])+" persistent functions loaded from "+str(b[2])+" modules")
+        _logtext(str(a[4])+" persistent startups loaded from "+str(b[4])+" modules")
         _logtext(str(a[3])+" replacement functions loaded from "+str(b[3])+" modules")
 
         if module.startfunc:

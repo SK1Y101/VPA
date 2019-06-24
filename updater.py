@@ -1061,11 +1061,11 @@ def getnewdir():
 def donothing():
     popup("Error","That feature has not yet\nbeen implemented.\n\nPlease wait for future updates.")
 
-def popup(title="",text="",posx=200,posy=200,resize=False):
+def popup(title="",text="",posx=200,posy=200,resize=False,padx=5,pady=5):
     nothing=genwindow(title=title,posx=posx,posy=posy,resize=resize)
     message,okay=Label(nothing,text=text),Button(nothing,text="Okay",command=nothing.destroy)
-    message.pack(pady=5)
-    okay.pack(pady=5)
+    message.pack(pady=pady,padx=padx)
+    okay.pack(pady=pady,padx=padx)
     mainloop()
 
 def returndir(entry="",newdir=""):
