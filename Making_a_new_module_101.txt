@@ -83,7 +83,20 @@ module.needsdependancies("system",["_core","Reminders"])
 
 ---
 
-step nine: (Optional, Only for if you want the modules to automatically be updated)
+step nine:
+add any functions that shoudl be executed at shutdown to the shutdown function list:
+settings.funcsatshutdown.append("["VPA module name"].["Required function"]")
+
+["VPA module name"] 		- the name of the module the requirement is needed for				i.e.: "journal"
+["Required function"]		- the name of the function that should be executed at shutdown			i.e.: "savejournaldata"
+
+ie:
+
+settings.funcsatshutdown.append("journal.savejournaldata")
+
+---
+
+step ten:	(Optional, Only for if you want the modules to automatically be updated)
 If there are any local files that shouldn't be overwritten, Add the following code to the top of the __init__.py file:
 module.dont_overwrite(["List of modules that shouldn't be overwritten"]):
 
@@ -96,7 +109,7 @@ Will prevent the update from overwriting "test.txt","reminders.txt" and "newfile
 
 ---
 
-step ten: (Optional, Only for if you want the modules to automatically be updated)
+step eleven: (Optional, Only for if you want the modules to automatically be updated)
 Add the required VPA version to the top of __init__.py, this will allow the updater to update and maintain any future updates of the module.
 module.modversion(["VPA module name"],["VPA version"],["module installation url"])
 
@@ -120,7 +133,7 @@ ie:
 
 ---
 
-step eleven: (Optional, Only for if you want the modules to automatically be updated)
+step twelve: (Optional, Only for if you want the modules to automatically be updated)
 Add the module to the updater program repositry by contacting the current person maintaining the thread, and sending them the name of your module, Your chosen authur name and any accreditation, and the file link to its folder repository.
 ie:
 'could you add my module, queries, which is at "https://drive.google.com/queries/"'
@@ -128,21 +141,22 @@ ie:
 Note! Currently we can only load files from dropbox (As that is the file platform we have been using), for installation of modules from elsewhere, please allow some time for the developers to fix this.
 ---
 
-step twelve: (Optional, Only for if you want the modules to automatically be updated)
-Ensure the correct naming of the zipfile archves in the online repository to allow the updater to more easily retrieve data.
+step thirteen: (Optional, Only for if you want the modules to automatically be updated)
+(this step is not strictly required, but we would recomend it
+Ensure the correct naming of the zipfile archves in the online repository to allow the updater to more easily retrieve data, from first to most recent.
 Ie:
 
 -Queries
-  |- 0.1.41.zip
-  |- 0.1.40.zip
   |- 0.1.31.zip
+  |- 0.1.40.zip
+  |- 0.1.41.zip
   etc...
 
 Note! Currently we can only load Zip archives (As that is the most suported filetype), for installation of modules via other means (Such as RAR), please allow some time for the developers to fix this.
 
 ---
 
-step thirteen:
+step fourteen:
 place the folder containing the module in the main directory, the same as another module labeled "_core".
 DO NOT EVER REMOVE, MODIFY OR TAMPER WITH EITHER THE CORE FOLDER, ITS CONTENTS NOR LOABIS.PY - THEESE ARE REQUIRED FOR THE USUAL FUNCTION OF THE PROGRAM
 

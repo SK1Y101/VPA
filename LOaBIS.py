@@ -8,7 +8,8 @@ def getcom(text=""):
             break
     try:
         globals()[x.replace(" ","")](text.replace(x,"").replace(settings.cwords[settings.funcs.index(x)],""))
-    except:
+    except Exception as inst:
+        logtext("ERROR IN CODE EXECUTION:\n--------------------\n"+str(type(inst))+"\n-"+str(inst)+"\nDon't do ^That until the developers can fix it.\n--------------------")
         say("Function '"+text[0:text.index(" ")]+"' Does not exist")
     if x != "goodbye":
         interface()

@@ -1,3 +1,9 @@
+0.1.61:
+added a new _core function that allows modules to execute certain functionalities on shutdown as well as startup.
+discontinued work on overwriting the main VPA functions -took too many resources and could destroy functionality.
+new features added previously should now work just fine (but we can't tell you what they are, it's a secret)
+Actually finished the work on _core.help that we started in 0.1.55
+
 0.1.60: -The "we haven't added enough to warrant a new minor version but we've gotten bored of writing the number 5" Update.
 added a few mini features to _core in preperation for a new update.
 started work on adding the remaining Updater functions that weren't available previously.

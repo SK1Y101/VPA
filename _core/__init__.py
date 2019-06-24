@@ -1,7 +1,7 @@
-import sys,os,csv,datetime,importlib
+import sys,os,csv,datetime,importlib,random
 from _core import module
 from time import sleep
-module.modversion("_core","0.1.60","url")
+module.modversion("_core","0.1.61","url")
 module.dont_overwrite(["log.txt","UpdaterData.txt"])
 
 def startup():
@@ -19,15 +19,18 @@ def startup():
     settings.addglobal("desc",[],True)
     settings.addglobal("software",'""',True)
     settings.addglobal("version",'""',True)
+    settings.addglobal("funcsatshutdown",[])
     try:
         y = settings.modules
         x = settings.dont_inst
+        fas = settings.funcsatshutdown
         importlib.reload(settings)
     except:
         importlib.reload(settings)
     try:
         settings.modules = y
         settings.dont_inst = x
+        settings.funcsatshutdown = fas
     except:
         module.init()
         
@@ -138,10 +141,34 @@ def listen(text=""):
     return text
 
 def goodbye(text=""):
-    say("goodbye")
+    say("-- Quiting... Saving data... --")
+    for x in settings.funcsatshutdown:
+        try:
+            try:
+                exec("from .. import "+str(x.split(".")[0]))
+            except:
+                try:
+                    exec("from . import "+str(x.split(".")[0]))
+                except:
+                    exec("import "+str(x.split(".")[0]))
+            try:
+                exec(str(x.split(".")[0]).replace("()","")+"()")
+            except:
+                exec(str(x).replace("()","")+"()")
+        except Exception as inst:
+            logtext("ERROR IN CODE EXECUTION:\n--------------------\n"+str(type(inst))+"\n-"+str(inst)+"\nDon't do ^That until the developers can fix it.\n--------------------")
+    settings.addglobal("funcsatshutdown",[],True)
+    writebackup()
+    say("-- Shutdown complete, goodbye --")
     logtext("Closing software\n")
 
 def showhelp(text=""):
+    say("commands: description\n(Some functions have been ommitted due to shared functionality, to see all functions, type fullhelp)")
+    for x in range(len(settings.cwords)):
+        if settings.funcs.index(settings.funcs[settings.cwords.index(settings.cwords[x])]) == x:
+            say(settings.cwords[x]+": "+settings.desc[x])
+
+def showfullhelp(text=""):
     say("commands: description")
     for x in range(len(settings.cwords)):
         say(settings.cwords[x]+": "+settings.desc[x])
