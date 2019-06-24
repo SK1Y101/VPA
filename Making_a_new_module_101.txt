@@ -92,6 +92,7 @@ It is very important that all of the files are named correctly, and that they ar
 ie:
 
 module.dont_overwite(["test.txt","reminders.txt","newfile.txt"])
+Will prevent the update from overwriting "test.txt","reminders.txt" and "newfile.txt"
 
 ---
 

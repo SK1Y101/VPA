@@ -1,7 +1,7 @@
 import sys,os,csv,datetime,importlib
 from _core import module
 from time import sleep
-module.modversion("_core","0.1.51","url")
+module.modversion("_core","0.1.52","url")
 
 def startup():
     from _core import settings,module

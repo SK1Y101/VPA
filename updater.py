@@ -3,16 +3,19 @@ from tkinter import *
 from tkinter.ttk import *
 
 def init():
-    globals()["data"] = getdata("UpdaterData.txt")
-    globals()["def_dir"] = os.getcwd()
-    globals()["directories"] = []
-    globals()["vpadirectory"] = ""
-    if data[data.index("default_directory")+1] == "None":
-        startup()
-        logtext("No default directory found, opening wizard")
-    else:
-        main()
-        logtext("Starting Module Updater")
+    try:
+        globals()["data"] = getdata("UpdaterData.txt")
+        globals()["def_dir"] = os.getcwd()
+        globals()["directories"] = []
+        globals()["vpadirectory"] = ""
+        if data[data.index("default_directory")+1] == "None":
+            logtext("No default directory found, opening wizard")
+            startup()
+        else:
+            main()
+            logtext("Starting Module Updater")
+    except Exception as inst:
+        logtext("ERROR IN CODE EXECUTION:\n--------------------\n"+str(type(inst))+"\n-"+str(inst)+"\nDon't do ^That until the developers can fix it.\n--------------------")
 
 def logtext(text="null"):
     text = text[0].upper()+text[1:len(text)]+"\n"
@@ -133,11 +136,20 @@ def initialload():
     progress.configure(maximum=int(len(online_modules)))
     globals()["module_versions"] = []
 
-    latest_onlinever = (online_version[len(online_version)-1])[0].replace(".rar","").replace(".zip","")
-    if latest_onlinever > local_version:
+    latestcorever,latestcoredl = (online_version[len(online_version)-1])[0].replace(".rar","").replace(".zip",""),(online_version[len(online_version)-1])[1]
+    if latestcorever > local_version:
         core_update = "available"
     else:
         core_update = "-"
+
+    if core_update!="-":
+        b = Button(ml,text=core_update,command=lambda n="core",l=latestcorever,ldl=latetscoredl: updatever(n,l,ldl)).grid(row=1,column=1,sticky=W+E)
+    else:
+        b = Button(ml,text=core_update,state=DISABLED).grid(row=1,column=1,sticky=W+E)
+        
+    b = Button(ml,text="VPA Core",command=lambda n="core",l=latestcorever,v=online_version: onnameclick(n,l,v),state=DISABLED).grid(row=1,column=2,sticky=W+E)
+    b = Button(ml,text=local_version,state=DISABLED).grid(row=1,column=3,sticky=W+E)
+    b = Button(ml,text=latestcorever,state=DISABLED).grid(row=1,column=4,sticky=W+E)
 
     updatetable()
         
@@ -175,21 +187,21 @@ def updatetable():
                 mods_to_inst.append(name)
                 mods_to_inst.append(installedver)
                 mods_to_inst.append(latestver)
-            b = Checkbutton(ml,text="Installed",variable=tickvar,command=lambda v=tickvar,n=name,cv=installedver,lv=latestver: ontick(v,n,cv,lv)).grid(ipadx=10,row=x+1,column=0,sticky=W+E)
+            b = Checkbutton(ml,text="Installed",variable=tickvar,command=lambda v=tickvar,n=name,cv=installedver,lv=latestver: ontick(v,n,cv,lv)).grid(ipadx=10,row=x+2,column=0,sticky=W+E)
         else:
             tickvar = BooleanVar()
             tickvar.set(False)
-            b = Checkbutton(ml,text="Installed",variable=tickvar,command=lambda v=tickvar,n=name,cv=installedver,lv=latestver: ontick(v,n,cv,lv)).grid(ipadx=10,row=x+1,column=0,sticky=W+E)
+            b = Checkbutton(ml,text="Installed",variable=tickvar,command=lambda v=tickvar,n=name,cv=installedver,lv=latestver: ontick(v,n,cv,lv)).grid(ipadx=10,row=x+2,column=0,sticky=W+E)
             
         if (installed == 1) and (updates!="-"):
-            b = Button(ml,text=updates,command=lambda n=name,l=latestver,ldl=latetsverdl: updatever(n,l,ldl)).grid(row=x+1,column=1,sticky=W+E)
+            b = Button(ml,text=updates,command=lambda n=name,l=latestver,ldl=latetsverdl: updatever(n,l,ldl)).grid(row=x+2,column=1,sticky=W+E)
         else:
-            b = Button(ml,text=updates,state=DISABLED).grid(row=x+1,column=1,sticky=W+E)
+            b = Button(ml,text=updates,state=DISABLED).grid(row=x+2,column=1,sticky=W+E)
             
         versions = module_versions[2*x+1]
-        b = Button(ml,text=name,command=lambda n=name,l=latestver,v=versions: onnameclick(n,l,v)).grid(row=x+1,column=2,sticky=W+E)
-        b = Button(ml,text=installedver,state=DISABLED).grid(row=x+1,column=3,sticky=W+E)
-        b = Button(ml,text=latestver,state=DISABLED).grid(row=x+1,column=4,sticky=W+E)
+        b = Button(ml,text=name,command=lambda n=name,l=latestver,v=versions: onnameclick(n,l,v)).grid(row=x+2,column=2,sticky=W+E)
+        b = Button(ml,text=installedver,state=DISABLED).grid(row=x+2,column=3,sticky=W+E)
+        b = Button(ml,text=latestver,state=DISABLED).grid(row=x+2,column=4,sticky=W+E)
         progress.step(1)
         #use "command=lambda: ["function"](x, y, z, ...)" to pass variables into a function.
 
@@ -215,8 +227,8 @@ def ontick(v="",name="",current="",newest=""):
             mods_to_inst.pop(x)
             mods_to_inst.pop(x)
         
-    if name in local_modules:
-        print(local_modules[local_modules.index(name):local_modules.index(name)+3])
+    #if name in local_modules:
+        #print(local_modules[local_modules.index(name):local_modules.index(name)+3])
 
 def openurl(url=""):
     subprocess.call("start "+url,shell=True)
@@ -275,14 +287,15 @@ def updatever(name="",latestver="",url=""):
                 y+=1
             logtext("Checking overwrite conflicts")
             f = open(name+str("//__init__.py"),"r")
-            m = f.read()
+            overwrites = f.read()
             f.close()
-            if "module.dont_overwrite([" in m:
-                m = ((m.split("module.dont_overwrite([")[1]).split("])")[0]).replace('"',"").split(",")
-            temp = []
-            for x in m:
+            old_files = ""
+            if "module.dont_overwrite([" in overwrites:
+                old_files = ((m.split("module.dont_overwrite([")[1]).split("])")[0]).replace('"',"").split(",")
+            tempfiles = []
+            for x in old_files:
                 f = open(name+"//"+x,"r")
-                temp.append(f.read())
+                tempfiles.append(f.read())
                 f.close()
             logtext("Extracting "+name)
             zip_file = zipfile.ZipFile(str(file_name.replace("\\","\\\\").replace("/","\\\\")),"r")
@@ -291,9 +304,9 @@ def updatever(name="",latestver="",url=""):
             os.remove(file_name)
             ptext.set(name+" Extracted, Updating")
             logtext(name+" Updated to "+latestver)
-            for x in m:
+            for x in old_files:
                 f = open(name+"//"+x,"w")
-                f.write(temp[m.index(x)])
+                f.write(tempfiles[old_files.index(x)])
                 f.close()
             logtext("Updating "+name)
             progress.step()
@@ -310,7 +323,8 @@ def updatever(name="",latestver="",url=""):
         else:
             print("Unsuported filetype")
             logtext("Unsuported filetype for: "+name+" v."+latestver+" @ Url")
-    except:
+    except Exception as inst:
+        logtext("ERROR IN CODE EXECUTION:\n--------------------\n"+str(type(inst))+"\n-"+str(inst)+"\nDon't do ^That until the developers can fix it.\n--------------------")
         #from tkinter import messagebox
         z = ["collecting name","saving file","extracting file","applying update"]
         if messagebox.askokcancel(icon="error",title="Error",message="Error: "+z[y]+"\nOpen the directory?"):
@@ -475,6 +489,9 @@ def startup():
     
     for x in ["Name;Version;Path"]+data[data.index("<directories>")+1:data.index("</directories>")]:
         y = x.split(";")
+        acver = getVPAversion(removeextension(y[2]))
+        if (y[1] != getVPAversion(removeextension(y[2]))) and (y[1] != "Version"):
+            y[1] = getVPAversion(removeextension(y[2]))
         while len(y[0]) < 20:
             y[0] +=" "
         while len(y[1]) < 10:
@@ -520,20 +537,24 @@ def launchVPA():
         file_name = vpadirectory+"\\LOaBIS.py"
     master.destroy()
     logtext("Updater terminated, Executing VPA")
-    os.systen(file_name)
+    os.system(file_name)
 
 def applychanges():
+    logtext("Applying selected changes")
     import shutil
     passinst = []
     for x in range(int(len(mods_to_inst)/3)):
         passinst.append([mods_to_inst[3*x],mods_to_inst[3*x+2],module_versions[module_versions.index(mods_to_inst[3*x])+1][-1:][0][1].replace("?dl=0","?dl=1")])
+    logtext("Installing chosen modules")
     installmods(passinst)
+    logtext("Uninstalling chosen modules")
     for x in range(int(len(mods_to_uninst)/3)):
         shutil.rmtree(vpadirectory+"\\"+mods_to_uninst[3*x])
+    logtext("Changes Complete")
 
 def installmods(installmods=""):
     for x in installmods:
-        print(x)
+        updatever(x[0],x[1],x[2])
 
 def main():
     globals()["mods_to_inst"] = []
@@ -581,7 +602,7 @@ def main():
     Refresh = Button(topbar,text="Refresh",command=launchloadthread).grid(row=0,column=1,sticky=W+E)
     Addchanges = Button(topbar,text="Apply changes",command=applychanges).grid(row=0,column=2,sticky=W+E)
 
-    ##launch the loadin thread
+    ##launch the loading thread
     launchloadthread()
 
     #list of all the modules
@@ -601,9 +622,9 @@ def main():
     b = Button(ml,text="Latest Version",style="header.TButton",state=DISABLED).grid(row=0,column=4,sticky=W+E)
 
     logtext("Initialised Main Updater program")
-
+    
     mainloop()
 
 if __name__ == "__main__":
-    init()
     logtext("Initialising Updater Software")
+    init()

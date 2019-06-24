@@ -1,3 +1,10 @@
+0.1.52:
+Fixed most of the errors that escaped undetected from 0.1.51
+Added some small adjustments to Updater.py
+added module.dont_overwrite to allow users to manintain data across versions and updates.
+New functionalities being added into Updater.py
+Small adjustments to modules and _core to account for the new Updater.py update
+
 0.1.51:
 Fixed a load of bugs with the new updater program. It should now ~work as expected.
 Not a lot else, ^ that took a lot of time and effort.

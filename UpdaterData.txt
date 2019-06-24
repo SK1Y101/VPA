@@ -1,5 +1,4 @@
 default_directory
 None
 <directories>
-LOaBIS;0.1.50;C:\Users\Owner\Desktop\Random_Crap\VPA\LOaBIS.py
 </directories>
