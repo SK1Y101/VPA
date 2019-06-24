@@ -142,7 +142,7 @@ if __name__=="__main__":
         _logtext("Retrieving modification functions")
         _say("Checking modification functions")
         a,b=[0,0,0,0],[0,0,0,0]
-        offlimits=["getcom","_logtext","_say","checkbackup","writebackup"]
+        offlimits=["getcom","_logtext","_say","checkbackup","writebackup","_startpers","_closepers"]
         for x in modules:
             z=getmodinfo(x)
             start,end,persist,old,new=z[5],z[7],z[6],z[8],z[9]

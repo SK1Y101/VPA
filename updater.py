@@ -1,8 +1,13 @@
-import datetime,os,subprocess,urllib.request,urllib.error,csv,zipfile,shutil,threading,time,webbrowser
+import datetime,os,subprocess,urllib.request,urllib.error,csv,zipfile,shutil,threading,time,webbrowser,sys
 from tkinter import *
 from tkinter.ttk import *
-globals()["Main_Data_Dir"]=os.path.expanduser("~")+"\\LOaBIS"
-globals()["iconpath"]=Main_Data_Dir+"\\Loa_icon.ico"
+
+ostype=sys.platform
+globals()["sep"]="/"
+if "win" in ostype:
+    globals()["sep"]="\\"
+globals()["Main_Data_Dir"]=os.path.expanduser("~")+sep+"LOaBIS"
+globals()["iconpath"]=Main_Data_Dir+sep+"Loa_icon.ico"
 
 def choosedirectory():
     _logtext("Launching module installer",1)
@@ -22,6 +27,7 @@ def choosedirectory():
     Open=setbutton(Buttons,"Open",8,lambda:opendirectory(Entries),1,1)
     Quit=setbutton(Buttons,"Quit",8,main.destroy,2,0)
     Launch=setbutton(Buttons,"Select",8,lambda:startmain(Entries,main),2,1)
+    Open=setbutton(Buttons,"Install",8,lambda:instdirectory(Entries),3,0)
     Info=Text(main,width=30,height=8)
 
     Buttons.grid(row=2,column=0,padx=5,pady=5,sticky=W)
@@ -33,17 +39,66 @@ def choosedirectory():
     main.bind("<Destroy>",lambda x:savedatafile())
     mainloop()
 
+def instdirectory(entry):
+    from tkinter.filedialog import askdirectory
+    _logtext("Installing new LOaBIS Version from online")
+    main = genwindow("Install LOaBIS",posx=100,posy=100,resize=False)
+    globals()["Direc"]=askdirectory(title="Select LOaBIS Locations")+sep+"Loa"
+    if not os.path.exists(Direc):
+        os.makedirs(Direc)
+    globals()["mtext"],globals()["ttext"],globals()["progress"]=StringVar(),StringVar(),Progressbar(main,mode="indeterminate")
+
+    versions=[]
+    if not os.path.isfile(Main_Data_Dir+sep+"temp_VPA.zip"):
+        getonlinefiles([getdat(getonlinemodules(),"VPA")])
+    with zipfile.ZipFile(Main_Data_Dir+sep+"temp_VPA.zip","r") as Zip:
+        with Zip.open("changelog.txt") as change:
+            a=str(change.read())[2:-1].replace("\\r","").replace("\r","").replace("\\n","\n").split("\n\n")
+            for y in a[0:10]:
+                versions.append(y.split(":")[0])
+    _logtext("Fetching "+str(len(versions))+" most recent versions: "+str(versions))
+
+    settop(main)
+
+    Name_text=Label(main,text="Name")
+    Dir_text=Label(main,text="Directory")
+    Ver_choice,Ver_text,Ver=dropdown(main,"Install Version","Select Version",versions,2,0,1,W)
+    Dir=Entry(main)
+    Name=Entry(main)
+    
+    Name_text.grid(row=0,column=0,padx=5,pady=5)
+    Name.grid(row=0,column=1,padx=5,pady=5)
+    Dir_text.grid(row=1,column=0,padx=5,pady=5)
+    Dir.grid(row=1,column=1,padx=5,pady=5)
+    Dir.insert(0,Direc+sep)
+    Dir.configure(state=DISABLED)
+
+    Accept=setbutton(main,"Accept",20,lambda:instloa(name,Ver_choice,main,entry),3,0)
+    Cancel=setbutton(main,"cancel",20,main.destroy,3,1)
+
+    mainloop()
+
+def instloa(name,version,main,entry):
+    _logtext("Installing LOaBIS Version "+str(version))
+    extracttoloc(Main_Data_Dir+sep+"temp_VPA.zip",Direc,version.get())
+    globals()["Focus_Dir"]=[0,0,Direc+sep+"LOaBIS.py"]
+    modinst(Direc+sep)
+    if os.path.isfile(Direc+sep+"temp_VPA.zip"):
+        os.remove(Direc+sep+"temp_VPA.zip")
+    _logtext("Installed successfully, returning to version select")
+    returndirs(name,main,entry)
+
 def bindcom(binder="",select=[],command=[]):
     for x in range(len(select)):
         binder.bind(select[x],command[x])
 
-def dropdown(window="",text="",default="",options=[],row=0,column=0,columnspan=1,sticky=""):
+def dropdown(window="",text="",default="",options=[],row=0,column=0,columnspan=1,sticky="",dropsticky=""):
     choice=StringVar()
     choices=[default]+options
     text=Label(window,text=text)
     option=OptionMenu(window,choice,*choices)
     text.grid(row=row,column=column,columnspan=columnspan,sticky=sticky)
-    option.grid(row=row,column=int(column+columnspan))
+    option.grid(row=row,column=int(column+columnspan),sticky=dropsticky)
     return choice,text,option
 
 def checkbox(window="",text="",value=0,row=0,column=0,columnspan=1,sticky=""):
@@ -78,12 +133,13 @@ def setscrollbox(window="",width=0,height=0,row=0,column=0,scolumn=0,columnspan=
 
 def checkicon():
     a,b=[".ico",".gif"],["htlqveg9moprz42/Loa_icon.ico?dl=0","e9p2o0cnhvm62dp/Loa_icon.gif?dl=0"]
+    _logtext("Checking LOaBIS Icon download")
     for x in range(2):
         if not os.path.isfile(iconpath.replace(".ico",a[x])):
-            _logtext(conpath.replace(".ico",a[x])+" not found")
+            _logtext(iconpath.replace(".ico",a[x])+" not found")
             if connect():
                 link="https://www.dropbox.com/s/"+b[x]
-                urllib.request.urlretrieve(link,"C:\\Users\\Owner\\LOaBIS\\Loa_icon"+a[x])
+                urllib.request.urlretrieve(link,iconpath.replace(".ico",a[x]))
 
 def seticon(main,icon=iconpath):
     try:
@@ -93,7 +149,8 @@ def seticon(main,icon=iconpath):
 
 def loaddatafile(directory=Main_Data_Dir):
     try:
-        with open(directory+"\\UpdaterData.txt","r") as f:
+        _logtext("Loading directory data")
+        with open(directory+sep+"UpdaterData.txt","r") as f:
             m=f.read()
         a=attempt(m,"Directories",[],True)
         for x in a:
@@ -136,7 +193,7 @@ def getmissing(show=[]):
     while len(show) < 6:
         show.append("")
     if not os.path.exists(show[2]):
-        show[2]=str(os.getcwd())+"\\LOaBIS.py"
+        show[2]=str(os.getcwd())+sep+"LOaBIS.py"
     info=os.stat(show[2])
     if not show[0]:
         show[0]="Default"
@@ -154,12 +211,14 @@ def getmissing(show=[]):
 
 def default_dir():
     _logtext("Fetching default directory")
-    dire=str(os.getcwd())+"\\LOaBIS.py"
+    dire=str(os.getcwd())+sep+"LOaBIS.py"
     info=os.stat(dire)
-    Dir_Data.append([makelen("Default",20),getactualver(dire,"0.2.00"),dire,now(),datetime.datetime.fromtimestamp(info.st_ctime).strftime('%Y-%m-%d %H:%M:%S').replace("-","/"),info.st_size])
+    if os.path.isfile(dire):
+        Dir_Data.append([makelen("Default",20),getactualver(dire,"0.2.00"),dire,now(),datetime.datetime.fromtimestamp(info.st_ctime).strftime('%Y-%m-%d %H:%M:%S').replace("-","/"),info.st_size])
 
 def savedatafile(directory=Main_Data_Dir):
-    with open(str(directory)+"\\UpdaterData.txt","w") as f:
+    _logtext("Saving data")
+    with open(str(directory)+sep+"UpdaterData.txt","w") as f:
         f.write("<Directories>\n")
         for x in Dir_Data:
             x[1]=getactualver(x[2],x[1])
@@ -198,7 +257,7 @@ def removedirectory(entry):
 
 def getactualver(directory,ver,module="_core"):
     try:
-        with open(directory.replace("LOaBIS.py",str(module)+"//__init__.py"),"r") as f:
+        with open(directory.replace("LOaBIS.py",str(module)+sep+"__init__.py"),"r") as f:
             vers=(str(f.read()).split("module.module(")[1].split(")")[0].split(",")[1])[1:-1]
         return vers
     except:
@@ -235,8 +294,8 @@ def editdirectory(Entries=""):
         Name=Entry(Edit)
         Dir=Entry(Edit)
         Ver=Entry(Edit)
-        Accept=setbutton(Edit,"Accept",20,lambda:returndir(Name,Edit,Entries),3)
-        Change=setbutton(Edit,"Change Directory",20,lambda:returndir(Name,Edit,Entries),3,1)
+        Accept=setbutton(Edit,"Accept",20,lambda:returndirs(Name,Edit,Entries),3)
+        Change=setbutton(Edit,"Change Directory",20,lambda:returndirs(Name,Edit,Entries),3,1)
 
         Name_text.grid(row=0,column=0,padx=5,pady=5)
         Dir_text.grid(row=1,column=0,padx=5,pady=5)
@@ -262,8 +321,7 @@ def adddirectory(Entries=""):
     Name=Entry(Add_new)
     Dir=Entry(Add_new)
     Ver=Entry(Add_new)
-    Accept=setbutton(Add_new,"Accept",20,lambda:returndir(Name,Add_new,Entries),3,0)
-    Change=setbutton(Add_new,"Change Directory",20,lambda:returndir(Name,Add_new,Entries),3,0)
+    Accept=setbutton(Add_new,"Accept",20,lambda:returndirs(Name,Add_new,Entries),3,0)
 
     Name_text.grid(row=0,column=0,padx=5,pady=5)
     Dir_text.grid(row=1,column=0,padx=5,pady=5)
@@ -275,7 +333,7 @@ def adddirectory(Entries=""):
 
     mainloop()
 
-def returndir(Name="",main="",entry=""):
+def returndirs(Name="",main="",entry=""):
     if Name.get():
         name,info=makelen(Name.get(),30),os.stat(Found_dir)
         if Dir_Data:
@@ -367,12 +425,12 @@ def getlastdl():
     global Found_dir
     try:
         _logtext("Fetching last download time")
-        with open(Main_Data_Dir+"\\UpdaterData.txt","r") as f:
+        with open(Main_Data_Dir+sep+"UpdaterData.txt","r") as f:
             m=f.read()
         dlow=attempt(m,"Download",datetime.datetime(2000,1,1))
         globals()["last_download"]=datetime.datetime(int(dlow.split("-")[0]),int(dlow.split("-")[1]),int(dlow.split("-")[2].split(" ")[0]))
     except:
-        globals()["last_download"]=datetime.datetime.fromtimestamp(os.stat(Main_Data_Dir+"\\temp_VPA.zip").st_ctime)
+        globals()["last_download"]=datetime.datetime.fromtimestamp(os.stat(Main_Data_Dir+sep+"temp_VPA.zip").st_ctime)
 
 def loadthread(show,main,val=0):
     global last_download
@@ -381,7 +439,7 @@ def loadthread(show,main,val=0):
     mtext.set("Checking settings")
     download=False
     getlastdl()
-    if not os.path.isfile(Main_Data_Dir+"\\temp_VPA.zip"):
+    if not os.path.isfile(Main_Data_Dir+sep+"temp_VPA.zip"):
         download=True
     else:
         if (datetime.datetime.now()-last_download).days > min_download_days:
@@ -419,9 +477,9 @@ def loadthread(show,main,val=0):
                 mtext.set("Installing newest LOaBIS Version")
                 time.sleep(2)
                 thisdir=Focus_Dir[2].replace("LOaBIS.py","__Temp__")
-                tempfiles,filenames=getoverwrites(Focus_Dir[2].replace("LOaBIS.py","\\"+getdat(Data,x)[0]))
-                extracttoloc(Main_Data_Dir+"\\temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
-                modinst(thisdir+"\\",getdat(Data,x)[0],tempfiles,filenames)
+                tempfiles,filenames=getoverwrites(Focus_Dir[2].replace("LOaBIS.py",sep+getdat(Data,x)[0]))
+                extracttoloc(Main_Data_Dir+sep+"temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
+                modinst(thisdir+sep,getdat(Data,x)[0],tempfiles,filenames)
                 if os.path.isdir(thisdir):
                     shutil.rmtree(thisdir)
             progress.step()
@@ -432,7 +490,7 @@ def loadthread(show,main,val=0):
         main.destroy()
         if val==1:
             popup("Changes","The updated module data will be applied when the main installer window closed.\n\nPlease close the main installer")
-    elif os.path.isfile(Main_Data_Dir+"\\temp_VPA.zip"):
+    elif os.path.isfile(Main_Data_Dir+sep+"temp_VPA.zip"):
         a="Connection not established, using backup"
         _logtext(a)
         ttext.set("2 Seconds remaining")
@@ -463,7 +521,7 @@ def setdata(dire=""):
     files.remove("Loa_icon.gif")
     for x in files:
         try:
-            with zipfile.ZipFile(dire+"\\"+x,"r") as Zip:
+            with zipfile.ZipFile(dire+sep+x,"r") as Zip:
                 temp=[]
                 with Zip.open("metadata.txt") as meta:
                     a=str(meta.read())[2:-1].replace("\\r","").replace("\r","")
@@ -472,7 +530,7 @@ def setdata(dire=""):
                             temp.append(a.split(y+":")[1].replace("\\n","\n").split("\n")[0])
                         except:
                             temp.append("N/A")
-                temp.append(dire+"\\"+x)
+                temp.append(dire+sep+x)
                 with Zip.open("changelog.txt") as change:
                     a=str(change.read())[2:-1].replace("\\r","").replace("\r","").replace("\\n","\n").split("\n\n")
                     __temp=[]
@@ -488,7 +546,7 @@ def setdata(dire=""):
                     temp.append(__temp)
             Data.append(temp)
         except Exception as e:
-            _logtext("Could not open: "+str(dire+"\\"+x)+"\nError: "+str(type(e))+"; "+str(e))
+            _logtext("Could not open: "+str(dire+sep+x)+"\nError: "+str(type(e))+"; "+str(e))
     for x in Data:
         y=[x[0],x[1],x[2],x[3],x[4],x[5],x[6][0][0],x[6][0][1],x[6][0][2]]
         if x[0] !="VPA":
@@ -508,7 +566,7 @@ def getonlinefiles(modules=[]):
         name,url=x
         mtext.set(name+" - "+str(modules.index(x)+1)+"/"+str(len(modules)))
         progress.step()
-        out_file,headers = urllib.request.urlretrieve(url.replace("?dl=0","?dl=1"),Main_Data_Dir+"\\temp_"+name+".zip")
+        out_file,headers = urllib.request.urlretrieve(url.replace("?dl=0","?dl=1"),Main_Data_Dir+sep+"temp_"+name+".zip")
         time_taking.append((datetime.datetime.now()-stime).total_seconds())
         ttext.set("about "+str(round(average(time_taking)*(len(modules)-modules.index(x)),2))+" seconds remaining")
     _logtext("Modules loaded")
@@ -530,13 +588,13 @@ def connect():
         return False
 
 def getlocalmodules(dire=os.getcwd()):
-    modules=next(os.walk(dire.replace("\\LOaBIS.py","")))[1]
+    modules=next(os.walk(dire.replace(sep+"LOaBIS.py","")))[1]
     modules.sort()
     if "__pycache__" in modules:
         modules.remove("__pycache__")
     _logtext("Fetching "+str(int(len(modules)))+" local modules: "+str(modules))
     for x in range(len(modules)):
-        modules[x]=[modules[x],getactualver(dire.replace("LOaBIS.py","")+str(modules[x])+"\\__init__.py","0.0.00")]
+        modules[x]=[modules[x],getactualver(dire.replace("LOaBIS.py","")+str(modules[x])+sep+"__init__.py","0.0.00")]
     return modules
 
 def remexcess(text="",rem=" "):
@@ -784,7 +842,7 @@ def extracttoloc(startpath,endpath,version):
 
 def getoverwrites(dire=""):
     temp,old_files=[],[]
-    with open(dire+"\\__init__.py","r") as f:
+    with open(dire+sep+"__init__.py","r") as f:
         ovr=f.read()
     if "module.dont_overwrite(" in ovr:
         try:
@@ -793,7 +851,7 @@ def getoverwrites(dire=""):
             old_files=[((ovr.split("module.dont_overwrite(")[1]).split(")")[0]).replace('"',"")]
     for x in old_files:
         if x in os.listdir(dire):
-            with open(dire+"\\"+x,"r") as f:
+            with open(dire+sep+x,"r") as f:
                 temp.append(f.read())
         else:
             old_files.remove(x)
@@ -806,7 +864,7 @@ def modinst(dire="",name="",tempfiles=[],filenames=[]):
                 zip_file.extractall(Focus_Dir[2].replace("LOaBIS.py",""))
         if len(tempfiles)>0:
             for x in range(len(tempfiles)):
-                with open(Focus_Dir[2].replace("LOaBIS.py","\\"+name.lower()+"\\"+filenames[x]),"w") as f:
+                with open(Focus_Dir[2].replace("LOaBIS.py",sep+name.lower()+sep+filenames[x]),"w") as f:
                     f.write(tempfiles[x])
 
 def installchanges():
@@ -817,17 +875,17 @@ def installchanges():
     tabs.select(1)
     thisdir=Focus_Dir[2].replace("LOaBIS.py","__Temp__")
     for x in to_upd:
-        tempfiles,filenames=getoverwrites(Focus_Dir[2].replace("LOaBIS.py","\\"+getdat(Data,x)[0]))
-        extracttoloc(Main_Data_Dir+"\\temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
-        modinst(thisdir+"\\",getdat(Data,x)[0],tempfiles,filenames)
+        tempfiles,filenames=getoverwrites(Focus_Dir[2].replace("LOaBIS.py",sep+getdat(Data,x)[0]))
+        extracttoloc(Main_Data_Dir+sep+"temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
+        modinst(thisdir+sep,getdat(Data,x)[0],tempfiles,filenames)
     for x in to_uninst:
         try:
             shutil.rmtree(Focus_Dir[2].replace("LOaBIS.py",getdat(Data,x)[0]))
         except:
-            shutil.rmtree(Focus_Dir[2].replace("LOaBIS.py","\\"+getdat(Data,x)[0]))
+            shutil.rmtree(Focus_Dir[2].replace("LOaBIS.py",sep+getdat(Data,x)[0]))
     for x in to_inst:
-        extracttoloc(Main_Data_Dir+"\\temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
-    modinst(thisdir+"\\")
+        extracttoloc(Main_Data_Dir+sep+"temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
+    modinst(thisdir+sep)
     if os.path.isdir(thisdir):
         shutil.rmtree(thisdir)
     _logtext("Installation complete")

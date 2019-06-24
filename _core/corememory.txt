@@ -187,7 +187,9 @@ b=[0
 _logtext
 _say
 checkbackup
-writebackup]
+writebackup
+_startpers
+_closepers]
         for x in modules:
             z=getmodinfo(x)
             start

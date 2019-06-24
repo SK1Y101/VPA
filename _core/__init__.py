@@ -3,7 +3,7 @@ from . import module
 from time import sleep
 
 def main():
-    module.module("_core","0.2.04","N/A")
+    module.module("_core","0.2.05","N/A")
     module.startup([checkbackup])
 
 def init():
@@ -260,9 +260,16 @@ def getmods(txt=""):
 
 def getpip():
     try:
-        return subprocess.check_output("pip3 list",shell=True)
+        subprocess.call("python -m pip install --upgrade pip",shell=True)
     except:
-        return subprocess.check_output("pip list",shell=True)
+        pass
+    try:
+        try:
+            return subprocess.check_output("pip3 list",shell=True)
+        except:
+            return subprocess.check_output("pip list",shell=True)
+    except:
+        return ""
 
 def remmods(mod=[]):
     for x in mod:
