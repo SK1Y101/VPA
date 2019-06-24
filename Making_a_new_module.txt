@@ -21,6 +21,12 @@ Have fun, I look forward to your contribution to the VPA functionality!
 
 ====================
 
+This is a legacy document, outlining the steps to create a module without the use of the module wizard.
+While not neccesary to read when using the wizard, you may very well find this interesting anyway. for some reason.
+(although you may still have to perform steps six, seven, and nine until a later date)
+
+====================
+
 --- Step one ---
 a) create the folder for your module and place it in the same directory as LOaBIS.py.
 b) add the following two files to the folder:
@@ -227,7 +233,7 @@ The changelog file should contain:
 	[Taken from the unreleased 0.1.8 version of advanced_ui, and the unreleased uitools requirement]
 	*NOTES*
 	Only minversion,maxversion and required *HAVE* to be in this file. everything else is to be added at your own discretion
-	The above example only documents a single version tag. This file *MUST* include a tag for every version, released or otherwise
+	The above example only documents a single version tag. This file *MUST* include a tag for every version, released or otherwise, or they will not be visiable in the installer
 
 *I don't have a website to advertise myself, so I've left the homepage tag out.
 

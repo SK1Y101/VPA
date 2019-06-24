@@ -62,14 +62,16 @@ def setbutton(window="",text="",width=10,command="",row=0,column=0,padx=5,pady=5
     button.grid(row=row,column=column,padx=padx,pady=pady,columnspan=columnspan,sticky=sticky)
     return button
 
-def setscrollbox(window="",width=0,height=0,row=0,column=0,scolumn=0,columnspan=1,pady=0,padx=0,canvas=0):
-    if canvas:
+def setscrollbox(window="",width=0,height=0,row=0,column=0,scolumn=0,columnspan=1,pady=0,padx=0,wtype=0):
+    if wtype==2:
+        Box=Text(window,width=width,height=height)
+    elif wtype==1:
         Box=Canvas(window,width=width,height=height)
     else:
         Box=Listbox(window,width=width,height=height)
     Scroll=Scrollbar(window)
     Box.grid(row=row,column=column,columnspan=columnspan,pady=pady,padx=padx,sticky=N+S+E+W)
-    Scroll.grid(row=row,column=scolumn,pady=pady,padx=padx,sticky=N+S)
+    Scroll.grid(row=row,column=columnspan+max(column+1,scolumn),pady=pady,padx=padx,sticky=N+S)
     Box.config(yscrollcommand=Scroll.set)
     Scroll.config(command=Box.yview)
     return Box, Scroll
@@ -98,6 +100,8 @@ def loaddatafile(directory=Main_Data_Dir):
             if x:
                 if len(x.split(";")) <=5:
                     Dir_Data.append(getmissing(x.split(";")))
+                if len(x.split(";")) >6:
+                    Dir_Data.append(x.split(";")[0:6])
                 else:
                     Dir_Data.append(x.split(";"))
         if not (a or Dir_Data):
@@ -158,6 +162,7 @@ def savedatafile(directory=Main_Data_Dir):
     with open(str(directory)+"\\UpdaterData.txt","w") as f:
         f.write("<Directories>\n")
         for x in Dir_Data:
+            x[1]=getactualver(x[2],x[1])
             w=""
             for y in x:
                 w+=str(y)+";"
@@ -171,7 +176,9 @@ def getshow(entry):
         a=entry.curselection()[0]
     except:
         a=0
-    return Dir_Data[a]
+    ret=Dir_Data[a]
+    ret[3],ret[5]="",""
+    return getmissing(Dir_Data[a])
 
 def opendirectory(entry):
     if Dir_Data:
@@ -189,10 +196,10 @@ def removedirectory(entry):
             Dir_Data.remove(show)
             updateentries(entry)
 
-def getactualver(directory,ver):
+def getactualver(directory,ver,module="_core"):
     try:
-        with open(directory.replace("LOaBIS.py","_core/__init__.py"),"r") as f:
-            vers=(f.read().split("module.module(")[1].split(")")[0].split(",")[1])[1:-1]
+        with open(directory.replace("LOaBIS.py",str(module)+"//__init__.py"),"r") as f:
+            vers=(str(f.read()).split("module.module(")[1].split(")")[0].split(",")[1])[1:-1]
         return vers
     except:
         return ver
@@ -240,6 +247,7 @@ def editdirectory(Entries=""):
         Dir.insert(END,show[2])
         Name.insert(END,show[0].replace(" ",""))
         Ver.insert(END,show[1])
+        Ver.configure(state=DISABLED)
         globals()["Found_ver"],globals()["Found_dir"]=show[1:3]
 
         mainloop()
@@ -398,6 +406,25 @@ def loadthread(show,main,val=0):
             getonlinefiles(allmods)
             progress.step()
             globals()["last_download"],globals()["min_download_days"]=datetime.datetime.now(),mindlday
+        else:
+            a="Fetching online LOaBIS version"
+            _logtext(a)
+            mtext.set(a)
+            progress.stop()
+            progress.configure(mode="determinate",maximum=2)
+            mtext.set("Fetching LOaBIS Versions")
+            getonlinefiles([getdat(getonlinemodules(),"VPA")])
+            progress.step()
+            if str(autoupdate)=="True":
+                mtext.set("Installing newest LOaBIS Version")
+                time.sleep(2)
+                thisdir=Focus_Dir[2].replace("LOaBIS.py","__Temp__")
+                tempfiles,filenames=getoverwrites(Focus_Dir[2].replace("LOaBIS.py","\\"+getdat(Data,x)[0]))
+                extracttoloc(Main_Data_Dir+"\\temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
+                modinst(thisdir+"\\",getdat(Data,x)[0],tempfiles,filenames)
+                if os.path.isdir(thisdir):
+                    shutil.rmtree(thisdir)
+            progress.step()
         mtext.set("Loading complete")
         savedatafile(Main_Data_Dir)
         setdata(Main_Data_Dir)
@@ -655,7 +682,7 @@ def populate(main=""):
         instal.configure(command=lambda n=name,v=inst,s=instal,x=int(x+1):onclick(v,n,s,x,"ins"))
         instal.grid(row=x+const,column=0)
         update.grid(row=x+const,column=1)
-        name=Button(main,text=name,command=lambda n=name:setfocus(n)).grid(row=x+const,column=2,sticky=W+E)
+        name=Button(main,text=name,command=lambda n=name,v=x:setfocus(n,v)).grid(row=x+const,column=2,sticky=W+E)
         author=Button(main,text=y[2],state=DISABLED).grid(row=x+const,column=3,sticky=W+E)
         installed=Button(main,text=instver,state=DISABLED).grid(row=x+const,column=4,sticky=W+E)
         latest=Button(main,text=newest,state=DISABLED).grid(row=x+const,column=5,sticky=W+E)
@@ -703,7 +730,7 @@ def showchangelog(listbox,data,pos):
     L1.pack(anchor="w")
     L2=Label(main,text=sorttext(data[listbox.curselection()[0]][pos]),wraplength=width).pack(fill="both",padx=5,pady=5)
 
-def setfocus(focus="",focusval=0):
+def setfocus(focus,focusval):
     global infotab11,infotab1,infotab2,infotab21,Info
     DataFocus=Data.index(getdat(Data,focus))
     try:
@@ -854,7 +881,7 @@ def installer():
     addvpamodupd(canvas,2)
     s=Separator(canvas,orient=HORIZONTAL).grid(row=3,column=0,columnspan=7,sticky=W+E,pady=5)
     populate(canvas)
-    setfocus("VPA")
+    setfocus("VPA",0)
     updateupdate(updatei)
 
     mainloop()
@@ -875,7 +902,7 @@ def addvpamodupd(main="",place=0):
         update=Button(main,text="-",state=DISABLED).grid(row=place,column=1)
 
     instal=Button(main,text="-",state=DISABLED).grid(row=place,column=0)
-    name=Button(main,text=name,command=lambda n=name:setfocus(n)).grid(row=place,column=2,sticky=W+E)
+    name=Button(main,text=name,command=lambda n=name:setfocus(n,0)).grid(row=place,column=2,sticky=W+E)
     author=Button(main,text=y[2],state=DISABLED).grid(row=place,column=3,sticky=W+E)
     installed=Button(main,text=instver,state=DISABLED).grid(row=place,column=4,sticky=W+E)
     latest=Button(main,text=newest,state=DISABLED).grid(row=place,column=5,sticky=W+E)
@@ -993,5 +1020,6 @@ def returndir(entry="",newdir=""):
         pass
     installer()
 
-choosedirectory()
-_logtext("Program terminated")
+if __name__ == "__main__":
+    choosedirectory()
+    _logtext("Program terminated")

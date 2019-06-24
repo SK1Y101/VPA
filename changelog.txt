@@ -1,18 +1,28 @@
+0.2.04:
+minver:0.2.04
+maxver:0.2.04
+required:N/A
+Tada, we've included a very alpha module wizard now!
+While not exactly in-depth, it's functionality is evolving: currently it will setup directories and correct file structure and allow basic edditing
+perfect for a startup wizard and the more experianced. (Don't worry, we're working overtime adding features, this was a functional prerelease for testing purpose)
+some quality of life things and minor bug fixes in the updater.
+
 0.2.03:
-minversion:0.2.03
-maxversion:0.2.03
+minver:0.2.03
+maxver:0.2.03
 required:N/A
 fixed a problem with the installer where downloaded modules would be corrupt or in the wrong format.
 fixed a problem with the installer where some modules could not be udated/uninstalled.
 fixed a problem where LOaBIS could not fetch the installer pip modules in newer systems.
 fixed some syntactical errors missed in LOaBIS.
+Made the persistent code work. Finally.
 filled out a little more functionality on the installer.
 Maybe we did some optimisation on the installer. maybe.                                                                                                                                        (We didn't really)
 Started work on the module creation wizard, look out for that in the upcoming updates (I'm predicting 0.2.04 for that, this was mostly a bug fixing update).
 
 0.2.02: -The "lets finally revisit some of the older code because it's terrible"
-minversion:0.2.02
-maxversion:0.2.02
+minver:0.2.02
+maxver:0.2.02
 required:N/A
 Started work on the persistent code functionality.
 some light development on a user interface for the VPA, see the basicui module for a very unoptimised look at the possibilites.
@@ -24,8 +34,8 @@ Started moving important files over to a new LOaBIS Working directory!
 (Loa now has an icon too, look at us!)
 
 0.2.01:
-minversion:0.2.01
-maxversion:0.2.01
+minver:0.2.01
+maxver:0.2.01
 required:N/A
 Modified the updater script such that it would still work with the older file heirarchy and layout.
 slight modifications to the inbuilt printing, logging, and command execution functions.
@@ -33,8 +43,8 @@ Fixed module.replacefunction such that it now works. (previosuly there was an at
 some attempts at optimisation.
 
 0.2.00: -The "let's rewrite the whole codebase before we miss the opportunity to do so" Update-
-minversion:0.2.00
-maxversion:0.2.00
+minver:0.2.00
+maxver:0.2.00
 required:N/A
 Rewrote the entire program from scratch, should make it easier to debug and optimise, as well as for greater ease in the development of UI modules (see startup code and functional replacement for more details)
 added in new persistant timed code, where functions can be executed automatically at regular intervals.
@@ -50,16 +60,16 @@ Not much else, rewriting everything took a while. (as though the largest update 
 Added in a lot more attempts at humour and witiness in the patch notes. Not quite sure it's a good idea.
 
 0.1.62:
-minversion:0.1.62
-maxversion:0.1.62
+minver:0.1.62
+maxver:0.1.62
 required:N/A
 modified the _core.getcom module to ease troublshooting the program.
 _core.showhelp function added, thus should fulfil the role of the older _core.help.
 _core.help now only displays user functions that have different system functions asigned to them.
 
 0.1.61:
-minversion:0.1.61
-maxversion:0.1.61
+minver:0.1.61
+maxver:0.1.61
 required:N/A
 added a new _core function that allows modules to execute certain functionalities on shutdown as well as startup.
 discontinued work on overwriting the main VPA functions -took too many resources and could destroy functionality.
@@ -67,8 +77,8 @@ new features added previously should now work just fine (but we can't tell you w
 Actually finished the work on _core.help that we started in 0.1.55
 
 0.1.60: -The "we haven't added enough to warrant a new minor version but we've gotten bored of writing the number 5" Update.
-minversion:0.1.60
-maxversion:0.1.60
+minver:0.1.60
+maxver:0.1.60
 required:N/A
 added a few mini features to _core in preperation for a new update.
 started work on adding the remaining Updater functions that weren't available previously.
@@ -77,16 +87,16 @@ Began to look into getting the replace_function to replace functions in the main
 Added a function to clear pip installs.
 
 0.1.55:
-minversion:0.1.55
-maxversion:0.1.55
+minver:0.1.55
+maxver:0.1.55
 required:N/A
 Small Optimisation Fixes.
 Fixed some more errors raised by Updater. Hopefully theese will be the last problems to arise.
 Slightly modified the _core.help module to not display different functions that perform the same purpose.
 
 0.1.54:
-minversion:0.1.54
-maxversion:0.1.54
+minver:0.1.54
+maxver:0.1.54
 required:N/A
 Fixed many of the issues that escaped us in 0.1.53.
 Fixed some of the problems from trying to fix the problems in 0.1.53.
@@ -95,8 +105,8 @@ Bagan a new VPA Patch to stop the patch notes fpr 0.1.53 being too long.
 Fixed some errors ascociated with bad zipfile handling.
 
 0.1.53:	-The "Let's fix all of the Bugs we introduced in the previous three updates!" update-
-minversion:0.1.53
-maxversion:0.1.53
+minver:0.1.53
+maxver:0.1.53
 required:N/A
 Contiued to add functionality to the updater.
 Fixed an isse with updater not being able to show previous versions of modules.
@@ -108,8 +118,8 @@ Fixed some issues where the program attempted to check local versions of modules
 Log now actually shows all of the usefull data to debug the program.
 
 0.1.52:
-minversion:0.1.52
-maxversion:0.1.52
+minver:0.1.52
+maxver:0.1.52
 required:N/A
 Fixed most of the errors that escaped undetected from 0.1.51
 Added some small adjustments to Updater.py
@@ -118,16 +128,16 @@ New functionalities being added into Updater.py
 Small adjustments to modules and _core to account for the new Updater.py update
 
 0.1.51:
-minversion:0.1.51
-maxversion:0.1.51
+minver:0.1.51
+maxver:0.1.51
 required:N/A
 Fixed a load of bugs with the new updater program. It should now ~work as expected.
 Not a lot else, ^ that took a lot of time and effort.
 very slight adjustments to _core, nothing particularly noticeable (modified _core.modules to work with the updater)
 
 0.1.50: -The big Updater Update-
-minversion:0.1.50
-maxversion:0.1.50
+minver:0.1.50
+maxver:0.1.50
 required:N/A
 Updater program supplied with program to allow automatic installation and updating of software.
 Custom modules will now be able to call other modules as dependencies.
@@ -143,8 +153,8 @@ Some minor tweaks to program to allow compatability with new software.
 Minor optimisation fixes.
 
 0.1.41:
-minversion:0.1.41
-maxversion:0.1.41
+minver:0.1.41
+maxver:0.1.41
 required:N/A
 Reminders module complete and integrated into program.
 fixed small bug with _core.module overwriting previous functions.
@@ -152,8 +162,8 @@ slight modifications to _core.
 optimisation of reminders module.
 
 0.1.40:
-minversion:0.1.40
-maxversion:0.1.40
+minver:0.1.40
+maxver:0.1.40
 required:N/A
 Reminders module to be bundeled with next update.
 _core.module now allows custom functions to replace previous functions functionality.
@@ -163,16 +173,16 @@ Patch notes now bundeled with program (as opposed to developers only)
 Optimisation.
 
 0.1.31:
-minversion:0.1.31
-maxversion:0.1.31
+minver:0.1.31
+maxver:0.1.31
 required:N/A
 Queries module now bundeled with Program.
 Load time reduced to 20 seconds at most.
 Program should now log important details.
 
 0.1.30:
-minversion:0.1.30
-maxversion:0.1.30
+minver:0.1.30
+maxver:0.1.30
 required:N/A
 Program will now download any missing dependancies for default python modules.
 Fixed ongoing issue with porgram not importing commands from modules.
@@ -180,8 +190,8 @@ Minor bug fixes.
 Optimisation.
 
 0.1.23:
-minversion:0.1.23
-maxversion:0.1.23
+minver:0.1.23
+maxver:0.1.23
 required:N/A
 Fixed An issue with import order that caused core modules to be loaded in incorrect orders.
 Added in python module checks to stop program running if the modules aren't installed.
@@ -189,8 +199,8 @@ Created guide for adding custom modules.
 Cleaned up redundant code.
 
 0.1.20:
-minversion:0.1.20
-maxversion:0.1.20
+minver:0.1.20
+maxver:0.1.20
 required:N/A
 Added ability for program to load custom modules.
 Added settings module to allow for global variables.
@@ -198,8 +208,8 @@ Added command reading from modules into program.
 Fixed error which prevented program from loading.
 
 0.1.00:
-minversion:0.1.00
-maxversion:0.1.00
+minver:0.1.00
+maxver:0.1.00
 required:N/A
 Program is now modular.
 Expanded development team to include Luke Skinner.
@@ -209,8 +219,8 @@ First alpha released with the expanded development team.
 Optimisation.
 
 0.0.30:
-minversion:0.0.30
-maxversion:0.0.30:
+minver:0.0.30
+maxver:0.0.30:
 required:N/A
 Initial development restarted.
 Program is now not one huge chunk of code.
@@ -218,24 +228,24 @@ Program can actually do stuff and is somewhat readable.
 Really buggy stuff that basically never worked renamed to "experimental features".
 
 0.0.20:
-minversion:0.0.20
-maxversion:0.0.20:
+minver:0.0.20
+maxver:0.0.20:
 required:N/A
 Program now backs itself up.
 Program restores itself if tampered with without development passcode inputted.
 Data moved to textfile to allow storage on a multi-time use.
 
 0.0.10:
-minversion:0.0.10
-maxversion:0.0.10
+minver:0.0.10
+maxver:0.0.10
 required:N/A
 Initial creation.
 Barebones framework.
 Development name LOaBIS created. (Local Operations and Basic Intelligence System)
 
 0.0.05:
-minversion:0.0.05
-maxversion:0.0.05
+minver:0.0.05
+maxver:0.0.05
 required:N/A
 Program can read files.
 Program can save files.

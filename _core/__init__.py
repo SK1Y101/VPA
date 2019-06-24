@@ -1,9 +1,9 @@
-import csv,sys,datetime,os,random
+import csv,sys,datetime,os,random,subprocess
 from . import module
 from time import sleep
 
 def main():
-    module.module("_core","0.2.03","N/A")
+    module.module("_core","0.2.04","N/A")
     module.startup([checkbackup])
 
 def init():
@@ -251,6 +251,34 @@ def getmem(text="",coremem=[]):
     if not coremem:
         coremem=getcoredata()
     return coremem[coremem.index(text)+1:coremem.index("</"+text[1:len(text)])]
+
+def getmods(txt=""):
+    mod=str(txt).replace(" ","").replace("pip","").replace("setuptools","")
+    mod=''.join([i for i in mod if not i.isdigit()])
+    mod = list(filter(None, mod.replace(".","").split("\\r\\n")))
+    return mod[2:-1]
+
+def getpip():
+    try:
+        return subprocess.check_output("pip3 list",shell=True)
+    except:
+        return subprocess.check_output("pip list",shell=True)
+
+def remmods(mod=[]):
+    for x in mod:
+        try:
+            subprocess.call("pip3 uninstall "+str(x))
+        except:
+            subprocess.call("pip uninstall "+str(x))
+
+def clearpip(text=""):
+    a="Removing non-essential pip modules"
+    _logtext(a)
+    _say(a)
+    remmods(getmods(getpip()))
+    a="Removal finished"
+    _logtext(a)
+    _say(a)
 
 def encrypt(text="",key="`"):
     y=""

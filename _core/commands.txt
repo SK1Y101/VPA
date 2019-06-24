@@ -4,3 +4,5 @@ exit :closesoftware,Terminates the program safely, saving data.
 closesoftware :closesoftware,Terminates the program safely, saving data.
 help :showhelp,displays a quick overview of unique functions that are available.
 help_full :showfullhelp,displays a quick overview of EVERY function available.
+clearpip :clearpip,removes all of the non-essential pip modules; esentially performing a do-over.
+remove_modules :clearpip,removes all of the non-essential pip modules; esentially performing a do-over.
