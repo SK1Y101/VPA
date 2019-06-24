@@ -85,14 +85,13 @@ def _logtext(text="null"):
 
 def getmods():
     '''gets all of the installed LOaBIS Modules'''
-    x = str(subprocess.check_output("pip3 list",shell=True))
-    x = x[2:len(x)-1]
-    mods = []
-    while ")" in x:
-        x = x[0:x.index("(")-1]+"\n"+x[x.index(")")+5:len(x)]
-    while "\n" in x:
-        mods.append(x[0:x.index("\n")])
-        x = x[x.index("\n")+1:len(x)]
+    try:
+        x = str(subprocess.check_output("pip3 list",shell=True))
+    except:
+        x = str(subprocess.check_output("pip list",shell=True))
+    x,mods = x[2:len(x)-1].split("\\r\\n")[2:-1],[]
+    for y in x:
+        mods.append(y.split(" ")[0])
     globals()["Mods"] = mods
     return mods
 
@@ -118,9 +117,15 @@ def installmodule(mod=""):
     installmodule("wolframalpha")'''
     _logtext("Module: "+mod+" not installed, installing now")
     if sys.platform == "win32":
-        subprocess.call("pip3 install "+str(mod),shell=True)
+        try:
+            subprocess.call("pip3 install "+str(mod),shell=True)
+        except:
+            subprocess.call("pip install "+str(mod),shell=True)
     else:
-        subprocess.call("sudo pip3 install "+str(mod),shell=True)
+        try:
+            subprocess.call("sudo pip3 install "+str(mod),shell=True)
+        except:
+            subprocess.call("sudo pip install "+str(mod),shell=True)
     if mod in getmods():
         _logtext("module: "+mod+" installed")
         return True

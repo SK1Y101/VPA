@@ -5,6 +5,7 @@ globals()["Main_Data_Dir"]=os.path.expanduser("~")+"\\LOaBIS"
 globals()["iconpath"]=Main_Data_Dir+"\\Loa_icon.ico"
 
 def choosedirectory():
+    _logtext("Launching module installer",1)
     checkicon()
     main=genwindow("Choose Directory",posx=100,posy=100)
     globals()["Dir_Data"]=[]
@@ -12,7 +13,7 @@ def choosedirectory():
         os.makedirs(Main_Data_Dir)
     loaddatafile()
 
-    Headers=Label(main,text="Version   Name\t\t     Directory")
+    Headers=Label(main,text="Version   Name\t\t     Directory").grid(row=0,column=0,columnspan=3,padx=5,pady=5,sticky=W)
     Entries,Scroll=setscrollbox(main,70,10,1,0,3,3,5,5)
     Buttons=Frame(main)
     Add=setbutton(Buttons,"Add",8,lambda:adddirectory(Entries),0,0)
@@ -23,16 +24,18 @@ def choosedirectory():
     Launch=setbutton(Buttons,"Select",8,lambda:startmain(Entries,main),2,1)
     Info=Text(main,width=30,height=8)
 
-    Headers.grid(row=0,column=0,columnspan=3,padx=5,pady=5,sticky=W)
     Buttons.grid(row=2,column=0,padx=5,pady=5,sticky=W)
     Info.grid(row=2,column=1,padx=5,pady=5,sticky=N+S+E+W)
 
-    Entries.bind('<Double-1>', lambda x:Open.invoke())
-    Entries.bind('<<ListboxSelect>>',lambda x:changeinfo(Entries,Info))
+    bindcom(Entries,['<Double-1>','<<ListboxSelect>>'],[lambda x:Open.invoke(),lambda x:changeinfo(Entries,Info)])
     updateentries(Entries)
     changeinfo(Entries,Info)
     main.bind("<Destroy>",lambda x:savedatafile())
     mainloop()
+
+def bindcom(binder="",select=[],command=[]):
+    for x in range(len(select)):
+        binder.bind(select[x],command[x])
 
 def dropdown(window="",text="",default="",options=[],row=0,column=0,columnspan=1,sticky=""):
     choice=StringVar()
@@ -75,6 +78,7 @@ def checkicon():
     a,b=[".ico",".gif"],["htlqveg9moprz42/Loa_icon.ico?dl=0","e9p2o0cnhvm62dp/Loa_icon.gif?dl=0"]
     for x in range(2):
         if not os.path.isfile(iconpath.replace(".ico",a[x])):
+            _logtext(conpath.replace(".ico",a[x])+" not found")
             if connect():
                 link="https://www.dropbox.com/s/"+b[x]
                 urllib.request.urlretrieve(link,"C:\\Users\\Owner\\LOaBIS\\Loa_icon"+a[x])
@@ -87,9 +91,8 @@ def seticon(main,icon=iconpath):
 
 def loaddatafile(directory=Main_Data_Dir):
     try:
-        f=open(directory+"\\UpdaterData.txt","r")
-        m=f.read()
-        f.close()
+        with open(directory+"\\UpdaterData.txt","r") as f:
+            m=f.read()
         a=attempt(m,"Directories",[],True)
         for x in a:
             if x:
@@ -101,12 +104,9 @@ def loaddatafile(directory=Main_Data_Dir):
             default_dir()
     except:
         default_dir()
-    globals()["last_download"]=attempt(m,"Download",datetime.datetime(2000,1,1))
-    globals()["mindlday"]=int(attempt(m,"Mindl",1))
-    globals()["min_download_days"]=mindlday
-    globals()["autoupdate"]=attempt(m,"Autoupdate","False")
-    globals()["openwhenclosed"]=attempt(m,"Openwhenclosed","False")
-    globals()["download_all"]=attempt(m,"Download_all","False")
+    globals()["last_download"],globals()["mindlday"]=attempt(m,"Download",datetime.datetime(2000,1,1)),int(attempt(m,"Mindl",1))
+    globals()["min_download_days"],globals()["autoupdate"]=mindlday,attempt(m,"Autoupdate","False")
+    globals()["openwhenclosed"],globals()["download_all"]=attempt(m,"Openwhenclosed","False"),attempt(m,"Download_all","False")
     globals()["auto_dl_mod"]=attempt(m,"Auto_dl_mod","False")
     savedatafile()
 
@@ -115,8 +115,7 @@ def attempt(data="",find="",default="",lst=False):
     try:
         if lst==True:
             ret=data.split("<"+find+">")[1].split("</"+find+">")[0].split("\n")
-            temp=ret
-            _temp=[]
+            temp,_temp=ret,[]
             for x in range(len(temp)):
                 if len(str(temp[x])) < 20:
                     _temp=[x]+_temp
@@ -129,6 +128,7 @@ def attempt(data="",find="",default="",lst=False):
     return ret
 
 def getmissing(show=[]):
+    _logtext("Fetching missing data")
     while len(show) < 6:
         show.append("")
     if not os.path.exists(show[2]):
@@ -136,7 +136,7 @@ def getmissing(show=[]):
     info=os.stat(show[2])
     if not show[0]:
         show[0]="Default"
-    show[0] = makelen(show[0],30)
+    show[0]=makelen(show[0],30)
     if len(show[1]) !=len("0.2.00"):
         show[1]=getactualver(show[2],"0.2.00")
     if not show[3]:
@@ -145,25 +145,26 @@ def getmissing(show=[]):
         show[4]=datetime.datetime.fromtimestamp(info.st_ctime).strftime('%Y-%m-%d %H:%M:%S').replace("-","/")
     if not show[5]:
         show[5]=info.st_size
+    _logtext("Data found")
     return show
 
 def default_dir():
+    _logtext("Fetching default directory")
     dire=str(os.getcwd())+"\\LOaBIS.py"
     info=os.stat(dire)
-    Dir_Data.append(["Default                       ",getactualver(dire,"0.2.00"),dire,now(),datetime.datetime.fromtimestamp(info.st_ctime).strftime('%Y-%m-%d %H:%M:%S').replace("-","/"),info.st_size])
+    Dir_Data.append([makelen("Default",20),getactualver(dire,"0.2.00"),dire,now(),datetime.datetime.fromtimestamp(info.st_ctime).strftime('%Y-%m-%d %H:%M:%S').replace("-","/"),info.st_size])
 
 def savedatafile(directory=Main_Data_Dir):
-    f=open(str(directory)+"\\UpdaterData.txt","w")
-    f.write("<Directories>\n")
-    for x in Dir_Data:
-        w=""
-        for y in x:
-            w+=str(y)+";"
-        f.write(w[0:-1]+"\n")
-    writes=["</Directories>\n<Download>\n",str(last_download),"\n</Download>\n<Mindl>\n",str(mindlday),"\n</Mindl>\n<Autoupdate>\n",autoupdate,"\n</Autoupdate>\n<Openwhenclosed>\n",openwhenclosed,"\n</Openwhenclosed>\n<Download_all>\n",download_all,"\n</Download_all>\n<Auto_dl_mod>\n",auto_dl_mod,"\n</Auto_dl_mod>"]
-    for x in writes:
-        f.write(x)
-    f.close()
+    with open(str(directory)+"\\UpdaterData.txt","w") as f:
+        f.write("<Directories>\n")
+        for x in Dir_Data:
+            w=""
+            for y in x:
+                w+=str(y)+";"
+            f.write(w[0:-1]+"\n")
+        writes=["</Directories>\n<Download>\n",str(last_download),"\n</Download>\n<Mindl>\n",str(mindlday),"\n</Mindl>\n<Autoupdate>\n",autoupdate,"\n</Autoupdate>\n<Openwhenclosed>\n",openwhenclosed,"\n</Openwhenclosed>\n<Download_all>\n",download_all,"\n</Download_all>\n<Auto_dl_mod>\n",auto_dl_mod,"\n</Auto_dl_mod>"]
+        for x in writes:
+            f.write(x)
 
 def getshow(entry):
     try:
@@ -190,36 +191,35 @@ def removedirectory(entry):
 
 def getactualver(directory,ver):
     try:
-        f=open(directory.replace("LOaBIS.py","_core/__init__.py"),"r")
-        vers=(f.read().split("module.module(")[1].split(")")[0].split(",")[1])[1:-1]
-        f.close()
+        with open(directory.replace("LOaBIS.py","_core/__init__.py"),"r") as f:
+            vers=(f.read().split("module.module(")[1].split(")")[0].split(",")[1])[1:-1]
         return vers
     except:
         return ver
 
-def changeinfo(entry,text):
-    text.configure(state=NORMAL)
+def instext(text="",ins=[]):
     try:
         text.delete(0.0,END)
     except:
         text.delete(1.0,END)
+    text.configure(state=NORMAL)
+    for x in ins:
+        text.insert(END,x)
+    text.configure(state=DISABLED)
+
+def changeinfo(entry,text):
     if Dir_Data:
         show=getshow(entry)
         ver=getactualver(show[2],show[1])
-        text.insert(END,"Version:   "+str(ver)+"\n")
-        text.insert(END,"Created:   "+str(show[4])+"\n")
-        text.insert(END,"Added:     "+str(show[3])+"\n")
-        text.insert(END,"Size:      "+str(show[5])+" Bytes\n")
-        text.insert(END,"Name:      "+str(show[0][0:16])+"...\n")
-        text.insert(END,"Directory:\n"+str(show[2])+"\n")
-        text.configure(state=DISABLED)
+        a=["Version:   "+str(ver)+"\n","Created:   "+str(show[4])+"\n","Added:     "+str(show[3])+"\n","Size:      "+str(show[5])+" Bytes\n","Name:      "+str(show[0][0:16])+"...\n","Directory:\n"+str(show[2])+"\n"]
     else:
-        text.insert(END,"No Versions Found")
-        text.configure(state=DISABLED)
+        a=["No Versions Found"]
+    instext(text,a)
 
 def editdirectory(Entries=""):
     if Dir_Data:
         show=getshow(Entries)
+        _logtext("Editing directory "+str(show[0]))
         Edit=genwindow("Edit Directory",posx=150,posy=150,resize=False)
 
         Name_text=Label(Edit,text="Name")
@@ -240,12 +240,12 @@ def editdirectory(Entries=""):
         Dir.insert(END,show[2])
         Name.insert(END,show[0].replace(" ",""))
         Ver.insert(END,show[1])
-        globals()["Found_dir"]=show[2]
-        globals()["Found_ver"]=show[1]
+        globals()["Found_ver"],globals()["Found_dir"]=show[1:3]
 
         mainloop()
 
 def adddirectory(Entries=""):
+    _logtext("Adding new directory")
     Add_new=genwindow("Add New Directory",posx=150,posy=150,resize=False)
 
     Name_text=Label(Add_new,text="Name")
@@ -269,8 +269,7 @@ def adddirectory(Entries=""):
 
 def returndir(Name="",main="",entry=""):
     if Name.get():
-        name=makelen(Name.get(),30)
-        info=os.stat(Found_dir)
+        name,info=makelen(Name.get(),30),os.stat(Found_dir)
         if Dir_Data:
             for x in range(len(Dir_Data)):
                 if str((Dir_Data[x])[2])==str(Found_dir):
@@ -294,9 +293,8 @@ def getdir(Dir,Ver,main):
     globals()["Found_dir"]=askopenfilename(defaultextension="py",filetypes=(("Python files","*.py"),("All files", "*.*")),title="Select LOaBIS Install")
     while "LOaBIS.py" not in Found_dir:
         globals()["Found_dir"]=askopenfilename(defaultextension="py",filetypes=(("Python files","*.py"),("All files", "*.*")),title="SELECT A LOABIS INSTALL!!")
-    f=open(Found_dir.replace("LOaBIS.py","_core/__init__.py"),"r")
-    globals()["Found_ver"]=(f.read().split("module.module(")[1].split(")")[0].split(",")[1])[1:-1]
-    f.close()
+    with open(Found_dir.replace("LOaBIS.py","_core/__init__.py"),"r") as f:
+        globals()["Found_ver"]=(f.read().split("module.module(")[1].split(")")[0].split(",")[1])[1:-1]
     settop(main)
 
     Dir.delete(0,END)
@@ -315,14 +313,16 @@ def settop(main=""):
     main.attributes('-topmost', True)
     main.attributes('-topmost', False)
 
-def _logtext(text="null"):
+def _logtext(text="null",newline=0):
     text=text[0].upper()+text[1:len(text)]+"\n"
-    y=open("log.txt","a")
-    y.write("["+str(datetime.datetime.now())+"] - "+text)
-    y.close()
+    with open("log.txt","a") as y:
+        if newline==1:
+            y.write("\n")
+        y.write("["+str(datetime.datetime.now())+"] - "+text)
 
 def startmain(entry,prev):
     if Dir_Data:
+        _logtext("Initialising module instalation")
         savedatafile()
         show=getshow(entry)
         globals()["Focus_Dir"]=show
@@ -331,6 +331,7 @@ def startmain(entry,prev):
         installer()
 
 def tfl(val=0):
+    _logtext("Loading")
     main=genwindow("Loading")
     globals()["ptext"]=StringVar()
     globals()["mtext"]=StringVar()
@@ -357,9 +358,9 @@ def threadingload(main=""):
 def getlastdl():
     global Found_dir
     try:
-        f=open(Main_Data_Dir+"\\UpdaterData.txt","r")
-        m=f.read()
-        f.close()
+        _logtext("Fetching last download time")
+        with open(Main_Data_Dir+"\\UpdaterData.txt","r") as f:
+            m=f.read()
         dlow=attempt(m,"Download",datetime.datetime(2000,1,1))
         globals()["last_download"]=datetime.datetime(int(dlow.split("-")[0]),int(dlow.split("-")[1]),int(dlow.split("-")[2].split(" ")[0]))
     except:
@@ -367,6 +368,7 @@ def getlastdl():
 
 def loadthread(show,main,val=0):
     global last_download
+    _logtext("Checking settings")
     ptext.set("Loading Local Data")
     mtext.set("Checking settings")
     download=False
@@ -376,7 +378,9 @@ def loadthread(show,main,val=0):
     else:
         if (datetime.datetime.now()-last_download).days > min_download_days:
             download=True
-    mtext.set("Fetching Local Modules")
+    a="Fetching local modules"
+    _logtext(a)
+    mtext.set(a)
     globals()["localmods"]=getlocalmodules(show[2])
     ptext.set("Loading Online Data")
     mtext.set("Establishing Connection")
@@ -384,15 +388,16 @@ def loadthread(show,main,val=0):
     connection=connect()
     if connection:
         if download:
-            mtext.set("Fetching online modules")
+            a="Fetching online modules"
+            _logtext(a)
+            mtext.set(a)
             allmods=getonlinemodules()
             mtext.set(str(len(allmods))+" found")
             progress.stop()
             progress.configure(mode="determinate",maximum=int(1+len(allmods)))
             getonlinefiles(allmods)
             progress.step()
-            globals()["last_download"]=datetime.datetime.now()
-            globals()["min_download_days"]=mindlday
+            globals()["last_download"],globals()["min_download_days"]=datetime.datetime.now(),mindlday
         mtext.set("Loading complete")
         savedatafile(Main_Data_Dir)
         setdata(Main_Data_Dir)
@@ -401,15 +406,19 @@ def loadthread(show,main,val=0):
         if val==1:
             popup("Changes","The updated module data will be applied when the main installer window closed.\n\nPlease close the main installer")
     elif os.path.isfile(Main_Data_Dir+"\\temp_VPA.zip"):
+        a="Connection not established, using backup"
+        _logtext(a)
         ttext.set("2 Seconds remaining")
-        mtext.set("Connection not established, using backup")
+        mtext.set(a)
         setdata(Main_Data_Dir)
         time.sleep(1)
         main.destroy()
         if val==1:
             popup("Changes","The updated module data will be applied when the main installer window closed.\n\nPlease close the main installer")
     else:
-        mtext.set("Connection not established, Terminating")
+        a="Connection not established, Terminating"
+        _logtext(a)
+        mtext.set(a)
         ttext.set("1 Second remaining")
         time.sleep(1)
         main.destroy()
@@ -417,6 +426,7 @@ def loadthread(show,main,val=0):
             popup("Changes","The updated module data will be applied when the main installer window closed.\n\nPlease close the main installer")
 
 def setdata(dire=""):
+    _logtext("Formating found module data")
     #Data=[["name","screenname","author","description","url","file",["version","max loa version","min loa version","required","changelog"]]]
     globals()["Data"]=[]
     globals()["SmallData"]=[]
@@ -425,33 +435,36 @@ def setdata(dire=""):
     files.remove("Loa_icon.ico")
     files.remove("Loa_icon.gif")
     for x in files:
-        with zipfile.ZipFile(dire+"\\"+x,"r") as Zip:
-            temp=[]
-            with Zip.open("metadata.txt") as meta:
-                a=str(meta.read())[2:-1].replace("\\r","").replace("\r","")
-                for y in ["name","screenname","author","description","url"]:
-                    try:
-                        temp.append(a.split(y+":")[1].replace("\\n","\n").split("\n")[0])
-                    except:
-                        temp.append("N/A")
-            temp.append(dire+"\\"+x)
-            with Zip.open("changelog.txt") as change:
-                a=str(change.read())[2:-1].replace("\\r","").replace("\r","").replace("\\n","\n").split("\n\n")
-                __temp=[]
-                for y in a:
-                    _temp=[y.split(":")[0]]
-                    for w in ["minver:","maxver:","required:"]:
+        try:
+            with zipfile.ZipFile(dire+"\\"+x,"r") as Zip:
+                temp=[]
+                with Zip.open("metadata.txt") as meta:
+                    a=str(meta.read())[2:-1].replace("\\r","").replace("\r","")
+                    for y in ["name","screenname","author","description","url"]:
                         try:
-                            _temp.append(y.split(w)[1].split("\n")[0])
+                            temp.append(a.split(y+":")[1].replace("\\n","\n").split("\n")[0])
                         except:
-                            _temp.append("N/A")
-                    _temp.append(y)
-                    __temp.append(_temp)
-                temp.append(__temp)
-        Data.append(temp)
+                            temp.append("N/A")
+                temp.append(dire+"\\"+x)
+                with Zip.open("changelog.txt") as change:
+                    a=str(change.read())[2:-1].replace("\\r","").replace("\r","").replace("\\n","\n").split("\n\n")
+                    __temp=[]
+                    for y in a:
+                        _temp=[y.split(":")[0]]
+                        for w in ["minver:","maxver:","required:"]:
+                            try:
+                                _temp.append(y.split(w)[1].split("\n")[0])
+                            except:
+                                _temp.append("N/A")
+                        _temp.append(y)
+                        __temp.append(_temp)
+                    temp.append(__temp)
+            Data.append(temp)
+        except Exception as e:
+            _logtext("Could not open: "+str(dire+"\\"+x)+"\nError: "+str(type(e))+"; "+str(e))
     for x in Data:
         y=[x[0],x[1],x[2],x[3],x[4],x[5],x[6][0][0],x[6][0][1],x[6][0][2]]
-        if x[0] != "VPA":
+        if x[0] !="VPA":
             SmallData.append(y)
 
 def average(vals=[]):
@@ -462,23 +475,22 @@ def average(vals=[]):
 
 def getonlinefiles(modules=[]):
     time_taking=[]
+    _logtext("Fetching "+str(int(len(modules)))+" online modules: "+str(modules))
     for x in modules:
         stime=datetime.datetime.now()
         name,url=x
         mtext.set(name+" - "+str(modules.index(x)+1)+"/"+str(len(modules)))
         progress.step()
-        web=url.split(".com/")[0]+".com/"
-        with urllib.request.urlopen(url.replace("?dl=0","?dl=1")) as u,open(Main_Data_Dir+"\\temp_"+name+".zip","wb") as f:
-            shutil.copyfileobj(u,f)
+        out_file,headers = urllib.request.urlretrieve(url.replace("?dl=0","?dl=1"),Main_Data_Dir+"\\temp_"+name+".zip")
         time_taking.append((datetime.datetime.now()-stime).total_seconds())
         ttext.set("about "+str(round(average(time_taking)*(len(modules)-modules.index(x)),2))+" seconds remaining")
+    _logtext("Modules loaded")
 
 def getonlinemodules():
     url='https://www.dropbox.com/s/lhixedpidsarpxk/Modules.txt?dl=1' #dl=1 means it will rerieve a useable file (zip, or otherwise specified), as opposed to the html file of the webpage.
     data=[]
-    u=urllib.request.urlopen(url)
-    temp=str(u.read())[2:-1].replace("\\r\\n",",").split(",")
-    u.close()
+    with urllib.request.urlopen(url) as u:
+        temp=str(u.read())[2:-1].replace("\\r\\n",",").split(",")
     for x in range(int(len(temp)/2)):
         data.append([temp[2*x],temp[2*x+1].replace("?dl=0","?dl=1")])
     return data
@@ -495,6 +507,7 @@ def getlocalmodules(dire=os.getcwd()):
     modules.sort()
     if "__pycache__" in modules:
         modules.remove("__pycache__")
+    _logtext("Fetching "+str(int(len(modules)))+" local modules: "+str(modules))
     for x in range(len(modules)):
         modules[x]=[modules[x],getactualver(dire.replace("LOaBIS.py","")+str(modules[x])+"\\__init__.py","0.0.00")]
     return modules
@@ -534,6 +547,7 @@ def setbar(main=""):
     main.config(menu=menubar)
 
 def launchvpa():
+    _logtext("Closing installer")
     main.destroy()
     subprocess.call(['python', Focus_Dir[2]])
     if openwhenclosed=="True":
@@ -568,10 +582,10 @@ def getdlver(module=[],inst="",name=""):
             return 0,module[0],module[2]
 
 def getallowed(name=""):
-    mod = getdat(Data,name)
+    mod=getdat(Data,name)
     for x in range(int(minorver)):
-        dlo = getdat(mod[6],majorver+"."+makelen(int(minorver)-x,2,1))
-        if dlo != None:
+        dlo=getdat(mod[6],majorver+"."+makelen(int(minorver)-x,2,1))
+        if dlo !=None:
             break
     return dlo
 
@@ -592,7 +606,7 @@ def updateclick(var,name,self,x,t,ver):
             if name in to_uninst:
                 to_uninst.remove(name)
         else:
-            if (not name in to_uninst) and getdat(localmods,name.lower()):
+            if (not name in to_uninst) and getdat(localmods,getdat(Data,name)[0]):
                 to_uninst.append(name)
             if name in to_inst:
                 to_inst.remove(name)
@@ -603,8 +617,8 @@ def updateclick(var,name,self,x,t,ver):
     self.configure(text=str(var[x]).replace("True","✓").replace("False","✗"))
 
 def onclick(var,name,self,x,t):
-    dlo = getallowed(name)
-    if dlo != None:
+    dlo=getallowed(name)
+    if dlo !=None:
         updateclick(var,name,self,x,t,dlo[0])
     else:
         if download_all=="True":
@@ -624,22 +638,21 @@ def populate(main=""):
     const=4
     for x in range(len(SmallData)):
         y=SmallData[x]
+        name = y[1]
         _inst,instver=getinst(y[0])
         _upda,newest,vpamax=getdlver([y[6],y[7],y[8]],instver,y[0])
-        inst[str(x+1)]=bool(_inst)
-        upda[str(x+1)]=_upda
-        name=y[1]
-        if _upda == "-":
+        inst[int(x+1)],upda[int(x+1)]=bool(_inst),_upda
+        if _upda=="-":
             update=Button(main,text="-",state=DISABLED)
         else:
             if auto_dl_mod:
-                upda[str(x+1)]=1
+                upda[int(x+1)]=1
                 checkupdneeded(upda,name,x+1)
-            update=Button(main,text=str(upda[str(x+1)]).replace("True","✓").replace("False","✗").replace("1","✓").replace("0","✗"))
+            update=Button(main,text=str(upda[int(x+1)]).replace("True","✓").replace("False","✗").replace("1","✓").replace("0","✗"))
             update.configure(command=lambda n=name,v=upda,s=update,x=x+1:onclick(v,n,s,x,"upd"))
 
-        instal=Button(main,text=str(inst[str(x+1)]).replace("True","✓").replace("False","✗").replace("1","✓").replace("0","✗"))
-        instal.configure(command=lambda n=name,v=inst,s=instal,x=str(x+1):onclick(v,n,s,x,"ins"))
+        instal=Button(main,text=str(inst[int(x+1)]).replace("True","✓").replace("False","✗").replace("1","✓").replace("0","✗"))
+        instal.configure(command=lambda n=name,v=inst,s=instal,x=int(x+1):onclick(v,n,s,x,"ins"))
         instal.grid(row=x+const,column=0)
         update.grid(row=x+const,column=1)
         name=Button(main,text=name,command=lambda n=name:setfocus(n)).grid(row=x+const,column=2,sticky=W+E)
@@ -651,15 +664,15 @@ def populate(main=""):
 def sortlist(main="",sorttype=0):
     global SmallData
     a=[0,0,1,2,0,6,7]
-    Temp=sorted(SmallData, key = lambda x: x[int(a[sorttype])])
+    Temp=sorted(SmallData, key=lambda x: x[int(a[sorttype])])
     if Temp==SmallData:
         Temp=Temp[::-1]
     SmallData=Temp
     populate(main)
 
 def nameditem(title="",text="",row=0,column=0,padx=0,pady=0):
-    name = Label(infotab11,text=title+":",foreground="gray")
-    detail = Label(infotab11,text=text,wraplength=200)
+    name=Label(infotab11,text=title+":",foreground="gray")
+    detail=Label(infotab11,text=text,wraplength=200)
     underline(name)
     name.grid(row=row,column=column,padx=padx,pady=pady,sticky=W)
     detail.grid(row=row,column=column+1,padx=padx,pady=pady,sticky=W)
@@ -685,36 +698,35 @@ def sorttext(text=""):
 def showchangelog(listbox,data,pos):
     width=300
     main=genwindow("Changelog",width+10,width+110)
-    L1 = Label(main,text="Changelog:\n")
+    L1=Label(main,text="Changelog:\n")
     underline(L1)
     L1.pack(anchor="w")
-    L2 = Label(main,text=sorttext(data[listbox.curselection()[0]][pos]),wraplength=width).pack(fill="both",padx=5,pady=5)
+    L2=Label(main,text=sorttext(data[listbox.curselection()[0]][pos]),wraplength=width).pack(fill="both",padx=5,pady=5)
 
 def setfocus(focus="",focusval=0):
     global infotab11,infotab1,infotab2,infotab21,Info
     DataFocus=Data.index(getdat(Data,focus))
     try:
-        focusval=SmallData.index(getdat(SmallData,focus))
-        y=SmallData[focusval]
+        focusval,y=SmallData.index(getdat(SmallData,focus)),SmallData[focusval]
     except:
         b=Data[DataFocus]
         c=b[6][0]
         y=b[0],b[1],b[2],b[3],b[4],b[5],c[0],c[1]
     infotab11.destroy()
     infotab21.destroy()
-    infotab11 = Canvas(infotab1,width=10)
+    infotab11=Canvas(infotab1,width=10)
     infotab21,Scroll=setscrollbox(infotab2,30,10,1,0,3,3,5,5)
     infotab21.bind('<<ListboxSelect>>',lambda x:showchangelog(infotab21,Data[DataFocus][6],4))
     infotab11.pack()
-    Name = Label(infotab11,text=y[0]).grid(row=0,column=0,columnspan=2,padx=5,pady=5,sticky=W)
-    About = Label(infotab11,text=y[3],wraplength=300).grid(row=1,column=0,columnspan=2,padx=5,sticky=W)
+    Name=Label(infotab11,text=y[0]).grid(row=0,column=0,columnspan=2,padx=5,pady=5,sticky=W)
+    About=Label(infotab11,text=y[3],wraplength=300).grid(row=1,column=0,columnspan=2,padx=5,sticky=W)
     s=Separator(infotab11,orient=HORIZONTAL).grid(row=2,column=0,columnspan=2,sticky=W+E,pady=5)
     ver,content=nameditem("Version",y[6],3,0,5,5)
     auth,content=nameditem("Author",y[2],4,0,5,5)
     home,content=nameditem("Homepage",y[4],5,0,5,5)
     comp,content=nameditem("Compatible",y[7],6,0,5,5)
     for x in Data[DataFocus][6]:
-        ase = makelen(x[0],8)+"   "+makelen(x[1],8)+"   "+makelen(x[2],8)+"   "+makelen(x[3],8)
+        ase=makelen(x[0],8)+"   "+makelen(x[1],8)+"   "+makelen(x[2],8)+"   "+makelen(x[3],8)
         infotab21.insert(END,ase)
         a,b=compatible(x[1],x[2],Focus_Dir[1]),["#ffffff","#98FB98","#32CD32"]
         infotab21.itemconfig(END,bg=b[a])
@@ -738,6 +750,7 @@ def updateupdate(c=""):
     c.create_text(5,5,anchor=NW,text=a)
 
 def extracttoloc(startpath,endpath,version):
+    _logtext("extracting files from "+str(startpath)+" to "+str(endpath))
     with zipfile.ZipFile(str(startpath),"r") as zip_file:
         if getdat(zip_file.namelist(),version):
             zip_file.extract(getdat(zip_file.namelist(),version),endpath)
@@ -770,23 +783,32 @@ def modinst(dire="",name="",tempfiles=[],filenames=[]):
                     f.write(tempfiles[x])
 
 def installchanges():
+    _logtext("Installing changes")
+    _logtext(str(int(len(to_upd)))+" Updates to be installed: "+str(to_upd))
+    _logtext(str(int(len(to_uninst)))+" Modules to be uninstalled: "+str(to_uninst))
+    _logtext(str(int(len(to_inst)))+" Modules to be installed: "+str(to_inst))
     tabs.select(1)
     thisdir=Focus_Dir[2].replace("LOaBIS.py","__Temp__")
     for x in to_upd:
-        tempfiles,filenames=getoverwrites(Focus_Dir[2].replace("LOaBIS.py","\\"+x))
+        tempfiles,filenames=getoverwrites(Focus_Dir[2].replace("LOaBIS.py","\\"+getdat(Data,x)[0]))
         extracttoloc(Main_Data_Dir+"\\temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
-        modinst(thisdir+"\\",x,tempfiles,filenames)
+        modinst(thisdir+"\\",getdat(Data,x)[0],tempfiles,filenames)
     for x in to_uninst:
-        shutil.rmtree(Focus_Dir[2].replace("LOaBIS.py","\\"+x))
+        try:
+            shutil.rmtree(Focus_Dir[2].replace("LOaBIS.py",getdat(Data,x)[0]))
+        except:
+            shutil.rmtree(Focus_Dir[2].replace("LOaBIS.py","\\"+getdat(Data,x)[0]))
     for x in to_inst:
         extracttoloc(Main_Data_Dir+"\\temp_"+getdat(Data,x)[0]+".zip",thisdir,modinstver[x])
     modinst(thisdir+"\\")
     if os.path.isdir(thisdir):
         shutil.rmtree(thisdir)
+    _logtext("Installation complete")
     main.destroy()
     installer()
 
 def installer():
+    _logtext("Opening main installer window")
     globals()["home_dir"]=Focus_Dir[2].replace("//LOaBIS.py","").replace("/LOaBIS.py","").replace("\\LOaBIS.py","").replace("\LOaBIS.py","")
     globals()["localmods"]=getlocalmodules(Focus_Dir[2])
     width,height,title=600,300,"Module installation for:   "+remexcess(str(Focus_Dir[0]))+" - "+str(Focus_Dir[1])
@@ -817,10 +839,10 @@ def installer():
     globals()["infotab"]=Notebook(tab1)
     globals()["infotab1"],globals()["infotab2"]=Frame(infotab),Frame(infotab)
     globals()["infotab11"]=Canvas(infotab1)
-    globals()["infotab21"],Scroll = setscrollbox(infotab2,30,10,1,0,3,3,5,5)
+    globals()["infotab21"],Scroll=setscrollbox(infotab2,30,10,1,0,3,3,5,5)
     infotab21.bind('<<ListboxSelect>>',lambda x:showchangelog(infotab21,Data[DataFocus][6],4))
     infotab11.pack()
-    Name = Label(infotab2,text="Ver      MinVer   MaxVer   Required").grid(row=0,column=0,columnspan=3,sticky="W")
+    Name=Label(infotab2,text="Ver      MinVer   MaxVer   Required").grid(row=0,column=0,columnspan=3,sticky="W")
     infotab21.grid(row=0,column=0,columnspan=2,padx=5,pady=5,sticky=W)
     infotab.add(infotab1,text="Metadata")
     infotab.add(infotab2,text="Versions")
@@ -838,12 +860,9 @@ def installer():
     mainloop()
 
 def addvpamodupd(main="",place=0):
-    x=0
-    y=getdat(Data,"VPA")
-    instver=getdat(localmods,"_core")[1]
-    _upda,newest,vpamax=getdlver([y[6][0][0],y[6][0][1],y[6][0][2]],instver,y[0])
-    upda[x]=_upda
-    inst[x]=0
+    x,y=0,getdat(Data,"VPA")
+    inst[x],instver=0,getdat(localmods,"_core")[1]
+    upda[x],newest,vpamax=getdlver([y[6][0][0],y[6][0][1],y[6][0][2]],instver,y[0])
     name=y[1]
     if autoupdate:
         upda[x]=1
@@ -907,33 +926,31 @@ def updatersetting():
     mainloop()
 
 def changesetting(main,checkau,dlchoice,checkowc,checkdla,checkadm):
+    _logtext("Changing installer settings")
     globals()["mindlday"]=dlchoice.get()
     globals()["min_download_days"]=mindlday
-    globals()["autoupdate"]=str(checkau.get()).replace("0","False").replace("1","True")
-    globals()["openwhenclosed"]=str(checkowc.get()).replace("0","False").replace("1","True")
-    globals()["download_all"]=str(checkdla.get()).replace("0","False").replace("1","True")
-    globals()["auto_dl_mod"]=str(checkadm.get()).replace("0","False").replace("1","True")
+    a=["autoupdate","openwhenclosed","download_all","auto_dl_mod"]
+    b=[checkau.get(),checkowc.get(),checkdla.get(),checkadm.get()]
+    for x in range(len(a)):
+        globals()[str(a[x])]=str(b[x]).replace("0","False").replace("1","True")
     savedatafile()
     main.destroy()
 
 def aboutupdater():
     about=genwindow("about",posx=100,posy=100,resize=False)
 
-    title=Label(about,text="LOaBIS -- Local Operations and Basic Intelligence System")
-    Authors=Label(about,text="Authors:\nSkiy (Jack Lloyd-Walters)\nXectron (Luke Skinner)\n\n2015-"+str(datetime.datetime.now().year)+" All rights Reserved\n",foreground="dark gray")
-    source=Label(about, text="Source",cursor="hand2",foreground="blue")
-    report=Label(about, text="Report issue",cursor="hand2",foreground="blue")
-    contact=Label(about, text="Contact Devs",cursor="hand2",foreground="blue")
-    add=Label(about, text="Add module",cursor="hand2",foreground="blue")
-    version=Label(about,text="Version v "+Focus_Dir[1])
+    title=Label(about,text="LOaBIS -- Local Operations and Basic Intelligence System").grid(row=0,column=0,columnspan=3,pady=10)
+    Authors=Label(about,text="Authors:\nSkiy (Jack Lloyd-Walters)\nXectron (Luke Skinner)\n\n2015-"+str(datetime.datetime.now().year)+" All rights Reserved\n",foreground="dark gray").grid(row=2,column=1)
+    source=Label(about,text="Source",cursor="hand2",foreground="blue")
+    report=Label(about,text="Report issue",cursor="hand2",foreground="blue")
+    contact=Label(about,text="Contact Devs",cursor="hand2",foreground="blue")
+    add=Label(about,text="Add module",cursor="hand2",foreground="blue")
+    version=Label(about,text="Version v "+Focus_Dir[1]).grid(row=1,column=1)
 
-    title.grid(row=0,column=0,columnspan=3,pady=10)
-    Authors.grid(row=2,column=1)
     source.grid(row=3,column=1)
     report.grid(row=4,column=0)
     contact.grid(row=4,column=1,pady=5)
     add.grid(row=4,column=2)
-    version.grid(row=1,column=1)
 
     source.bind("<Button-1>",lambda x:webbrowser.open_new("https://www.dropbox.com/sh/yucoglcwxirfkoq/AAATgGPh961ept6AHtWN8CyFa?dl=0"))
     report.bind("<Button-1>",lambda x:donothing())
@@ -977,3 +994,4 @@ def returndir(entry="",newdir=""):
     installer()
 
 choosedirectory()
+_logtext("Program terminated")
