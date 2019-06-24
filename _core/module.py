@@ -59,8 +59,10 @@ def stopmodule(core="",mod=""):
         pass
 
 def replacefunction(core="",mod="",new_mod=""):
-    if hasattr(globals()[core],mod):
-        setattr(globals()[core],mod,new_mod)
+    print("It almost worked")
+    if hasattr(core,str(mod)):
+        print("It worked")
+        setattr(core,mod,new_mod)
         return True
     else:
         return False

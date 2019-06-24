@@ -1,7 +1,7 @@
 import sys,os,csv,datetime,importlib
 from _core import module
 from time import sleep
-module.modversion("_core","0.1.55","url")
+module.modversion("_core","0.1.60","url")
 module.dont_overwrite(["log.txt","UpdaterData.txt"])
 
 def startup():
@@ -145,3 +145,68 @@ def showhelp(text=""):
     say("commands: description")
     for x in range(len(settings.cwords)):
         say(settings.cwords[x]+": "+settings.desc[x])
+
+def encrypt(text="",key="`"):
+    y=""
+    text = text.replace(chr(9),"____-__-").replace(chr(10),"____-_-_")
+    for x in range(len(str(text))):
+        y+=chr(((ord(text[x])+ord(key[x%len(key)])-128)%96)+32)
+    return y
+
+def decrypt(text="",key="`"):
+    y=""
+    for x in range(len(str(text))):
+        y+=chr(((ord(text[x])-ord(key[x%len(key)])-128)%96)+32)
+    return y.replace("____-__-",chr(9)).replace("____-_-_",chr(10))
+
+def decryptfromfile(file="",pas=""):
+    ##will return a list of the decrypted contents of the file
+    try:
+        f = open(file,"r")
+        m = decrypt(f.read(),file+pas).split(chr(10))
+        f.close()
+        y=[]
+        for x in m:
+            y.append(decrypt(x.split("__-_--__")[1],x.split("__-_--__")[0]).split(","))
+        return y
+    except:
+        return []
+    
+def encrypttofile(file="",m=[],pas=""):
+    ##will encrypt a list into a file
+    y=""
+    for x in m:
+        key=""
+        w=""
+        for v in x:
+            w+=v+","
+        for z in range(random.randint(30,50)):
+            key+=chr(random.randint(32,96))
+        y+=key+"__-_--__"+encrypt(w[:-1],key)+"____-_-_"
+    f = open(file,"w")
+    f.write(encrypt(y[:-4],file+pas))
+    f.close()
+
+def resetpip(text=""):
+    import subprocess
+    logtext("user has selected to remove pip modules")
+    x = str(subprocess.check_output("pip list",shell=True))
+    x = x[2:len(x)-1]
+    not_inst = []
+    modules = []
+    while ")" in x:
+        x = x[0:x.index("(")-1]+"\n"+x[x.index(")")+5:len(x)]
+    while "\n" in x:
+        modules.append(x[0:x.index("\n")])
+        x = x[x.index("\n")+1:len(x)]
+
+    modules.pop(modules.index("pip"))
+    modules.pop(modules.index("setuptools"))
+    modules.pop(modules.index("virtualenv"))
+        
+    if listen("Are you sure you wish to remove pip modules?\n> ").lower() in ["yes","y"]:
+        for x in modules:
+            logtext("Uninstalling: "+x)
+            say("uninstalling: "+x)
+            subprocess.call("pip uninstall "+str(x))
+        say("Pip modules uninstalled, You will have to close the software to prevent major system erros")

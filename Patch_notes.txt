@@ -1,3 +1,10 @@
+0.1.60: -The "we haven't added enough to warrant a new minor version but we've gotten bored of writing the number 5" Update.
+added a few mini features to _core in preperation for a new update.
+started work on adding the remaining Updater functions that weren't available previously.
+Fixed the replace_function function so that the function replace functions.
+Began to look into getting the replace_function to replace functions in the main VPA program.
+Added a function to clear pip installs.
+
 0.1.55:
 Small Optimisation Fixes.
 Fixed some more errors raised by Updater. Hopefully theese will be the last problems to arise.

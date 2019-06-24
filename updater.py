@@ -596,10 +596,11 @@ def installmods(installmods=""):
         updatever(x[0],x[1],x[2])
 
 def helpwindow():
-    '''helpbox = Tk()
+    helpbox = Tk()
     helpbox.title("Help")
-    '''
-    donothing()
+    Launch = Button(helpbox,text="Currently Unavailable, sorry",state=DISABLED).pack()
+    Launch = Button(helpbox,text="Close",command=lambda:helpbox.destroy()).pack()
+    mainloop()
 
 def main():
     globals()["mods_to_inst"] = []
@@ -620,8 +621,8 @@ def main():
     menubar.add_cascade(label="File", menu=filemenu)
 
     settingmenu = Menu(menubar,tearoff=0)
-    settingmenu.add_command(label="VPA settings",command=donothing)
-    settingmenu.add_command(label="Installer settings",command=donothing)
+    settingmenu.add_command(label="VPA settings",command=openDir)
+    settingmenu.add_command(label="Installer settings",command=openDir)
     menubar.add_cascade(label="Settings", menu=settingmenu)
 
     menubar.add_command(label="Help", command=helpwindow)
