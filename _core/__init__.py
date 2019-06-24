@@ -3,7 +3,7 @@ from . import module
 from time import sleep
 
 def main():
-    module.module("_core","0.2.01","N/A")
+    module.module("_core","0.2.02","N/A")
     module.startup([checkbackup])
 
 def init():
@@ -15,6 +15,9 @@ def say(text=""):
         sys.stdout.write(x)
         sleep(0.003)
 
+def quicksay(text=""):
+    print(text)
+
 def _say(text=""):
     for x in "System: "+str(text)+"\n":
         sys.stdout.write(x)
@@ -23,6 +26,7 @@ def _say(text=""):
 def listen(text=""):
     for x in str(text)+"\n> ":
         sys.stdout.write(x)
+        sleep(0.003)
     return input()
 
 def showhelp(text=""):
@@ -199,6 +203,13 @@ def closesoftware(text=""):
     elapsed_time = divmod((datetime.datetime.now()-start_time).total_seconds(),60)
     _logtext("shutdown completed successfully, took "+str(elapsed_time[0]*60+elapsed_time[1])+" seconds\n")
     _say("Shutdown completed successfully, you may now quit the program safely")
+
+def getmem(text="",coremem=[]):
+    if not text[0] == "<":
+        text = "<"+text+">"
+    if not coremem:
+        coremem = getcoredata()
+    return coremem[coremem.index(text)+1:coremem.index("</"+text[1:len(text)])]
 
 def encrypt(text="",key="`"):
     y=""

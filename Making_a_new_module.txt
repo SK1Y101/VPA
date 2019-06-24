@@ -1,20 +1,36 @@
-This document gives a basic breakdown of the construction of a custom made module
-Make sure to follow the steps as consicely as possible if you are uncertain as to the process.
-Any steps that state "CONDITIONAL" are not strictly required. make sure to check the text if this applies to your module.
-any steps that state "RECOMENDED" are CONDITIONAL steps, but are very much recomended for you to undertake for the ease of everyone.
+====================
+
+Oh hey there reader of this oh-so-helpfull document, It's nice to see someone new once in a while.
+okay, so here's the breakdown:
+
+1) This document gives a basic breakdown of the construction of a custom made module.
+2) Make sure to follow the steps as consicely as possible, if you are uncertain as to the process, I'd recomend checking out other modules for guidance.
+	(yeah yeah, shameless advertisment of my own work, but hey, showing is better than telling sometimes)
+3) Any steps that state "CONDITIONAL" are required, provided you need the extra functionality they provide.
+4) any steps that state "RECOMENDED" also aren't required, but are recomended for you to undertake for the ease of everyone.
+	(is that how you spell "aren't", could someone check and get back to me, it looks weird)
+
+
 Have fun, I look forward to your contribution to the VPA functionality!
-	- Developer Skiy (Jack Lloyd-Walters).
-	*side note, Very few things have imaginitive names, so you'll probably quess how to do things without this document, But I'd recomend reading it anyway.
+	- Head Developer Skiy (Jack Lloyd-Walters). (yes I have a 'cool' alias. yes it's 'coolness' is to be determined by the reader)
+
+	*side note,		Very few things have imaginitive names, so you'll probably quess how to do things without this document, But I'd recomend reading it anyway.
+	*side side note,	I'll see you later (sooner than you think, if you read this document, actually)
+	*side side side note,	Nothing really, just thought I'd showcase some of the humour you'll find in documentation on LOaBIS
+											(Local Opperations and Basic Inteligence System)
+
+====================
 
 --- Step one ---
 a) create the folder for your module and place it in the same directory as LOaBIS.py.
 b) add the following two files to the folder:
-	__init__.py	- This allows python to recognise that the folder you have just created contains loadable scripts
-	commands.txt	- This allows the program to recognise functions from your script.
+	__init__.py			- This allows python to recognise that the folder you have just created contains loadable scripts
+	commands.txt			- This allows the program to recognise functions from your script.
 
 
 --- Step two ---
 Create your script. It dosen't have to be, but it is recomended to write it in the __init__.py file you created earlier.
+(Though if you do write it in anything that isn't __init__.py, which isn't a user function, make sure to import it in __init__.py)
 
 
 --- Step three ---
@@ -22,9 +38,9 @@ open commands.txt and append all of the user functions to the file, in the follo
 {"text to call function"} :{"name of function"},{"short description"}		(The space before the colon is no strictly required, but recomended nonetheless)
 
 Information:
-{"text to call function"}	- This is what the user will enter in the interface to call the function.
-{"name of function"}		- This is the name of the function that will be called in your script.
-{"short description"}		- A breif summary of what the function does, such that the user will be able to tell when they call for help.
+{"text to call function"}		- This is what the user will enter in the interface to call the function.
+{"name of function"}			- This is the name of the function that will be called in your script.
+{"short description"}			- A breif summary of what the function does, such that the user will be able to tell when they call for help.
 
 for example:
 help :showhelp,Displays a quick overview of what functions are available, and their purpose.
@@ -32,109 +48,207 @@ help :showhelp,Displays a quick overview of what functions are available, and th
 
 
 --- Step four ---
-append to the begining of __init__.py, the module identifier, which allows programs such as the updater/installer and the main program to identify it:
-module.module({"Module folder name"},{"Module applicable version"},{"Module URL"})
+Add the setup() function to the start of your module, and add the snippet bellow to it:
+
+def setup():
+    module.module({"module name"},{"Required VPA Version"},{"Module URL"})
 
 Information:
-{"Module folder name"}		- This is the name of the folder, this is generally also the name of the module.
-{"Module applicable version"}	- This is the version of the VPA that the module was written for.
-{"Module URL"}			- Though not strictly neccesary, this is the URL of th module version location.
+{"module name"}				- This is the name of the module (pretty self explanatory, huh?)
+{"Required VPA Version"}		- This is the VPA version this module release was written to run with.
+{"Module URL"}				- This is an optional, redundant, argument for backwards compatability. Even I'm not entirely sure if anything actually uses it anymore.
 
-for example:
-module.module("_core","0.2.00","N/A")
-(This tells the VPA that this module is _core, for VPA version 0.2.00, but does not have an applivable URL)
-
+ie:
+def setup():
+    module.module("reminders","0.2.01","N/A")
 
 --- Step five ---	CONDITIONAL
-If the module requires a pythonic module, not included in the default package, make sure to include the required code at the start of __init__.py
-module.needs([{"function"},{"function no.2"},{"etc..."}])
+add to the setup() function, in the same way that module.module was added, any of the following required items:
+1) Required python modules, not packaged in the standard install:
+	module.needs([{"required module 1/2/etc..."}]
+	
+	Information:
+	{"required module 1/2/etc..."}	- The name(s) of the python module (as it appears on pypi) that (is/are) required for the VPA module to run
 
-Information:
-{"function"} / {"function no.2"}- The Pip name of the required function that is needed for the correct useage of the module.
+	Ie:
+	module.needs(["wolfram alpha"])
+	-or- (in the event of multiple)
+	module.needs(["wolfram alpha","wheel"])
 
-for example:
-module.needs([wolframalpha,six])
-(This will check if the pythonic modules "wolframalpha" and "six" are installed)
+2) Required LOaBIS Modules:
+	module.hasdependancy([{"VPA module 1/2/etc..."}])
 
+	Information:
+	{"VPA module 1/2/etc..."}	- The name(s) of the LOaBIS Module (as defined by module.module) that (is/are) required.
 
---- Step six ---	CONDITIONAL
-Similar to step five, if there are any VPA modules that are required for the function of your module(s), use the following code to instruct the program of such:
-module.hasdependancy([{"VPA func. 1"},{"VPA func. 2"},{"etc..."}])
+	Ie:
+	module.hasdependancy(["basicui"])
+	-or- (in the event of multiple)
+	module.hasdependancy(["basicui","uitools"])
 
-Information:
-{"VPA func. 1"}/{"VPA func. 2"}	- the name of the VPA functions that must be loaded for this module to work
+3) Replacement functions:
+	module.replacefunction([{"old function 1/2/etc..."}],[{"new function 1/2/etc..."}])
+	
+	Information:
+	{"old function 1/2/etc..."}	- The old LOaBIS function(s) (in a module, or the main program itself) that (is/are) to be replaced
+	{"new function 1/2/etc..."}	- The new function(s) that (is/are) to replace them
 
-for example:
-module.hasdependancy([uitools,betterui])
-(This tells the VPA that this module must be loaded after (and only after) the two modules "uitools" and "betterui" have been loaded, in order to satisfy the dependancy)
+	Ie:
+	module.replacefunction([say],[write])
+	-or- (in the event of multiple)
+	module.replacefunction([say,listen],[speak,hear])
+	(replaces say and listen with speak and hear)
 
+4) functions to be executed on program shutdown, startup, or at regular intervals:
+	start:		module.startup([{"function 1/2/etc..."}])
+	shutdown:	module.shutdown([{"function 1/2/etc..."}])
+	persistent:	module.persist([{"function 1/2/etc..."}])
 
---- Step seven ---	CONDITIONAL
-If the module requires one of its own functions to replace that of another module, use the following code
-module.replacefunction([{"old func.1"},{"etc..."}],[{"new func.1"},{"etc..."}])
+	Information:
+	{"function 1/2/etc..."}		- The function(s) that (is/are) to be executed at startup, shutdown, or persistently
 
-Information:
-{"old func.1"}			-The old function which is to be replaced
-{"new func.1"}			-The new function which it is to be replaced with
+	Ie:
+	module.startup([getdata])
+	module.shutdown([savedata])
+	-or- (in the event of multiple)
+	module.startup([loaduitools,launchui])
+	module.persist([fetchmessages,typeup])
 
-for example:
-module.replacefunction([say,listen],[speak,hear])
-(This will replace the function "say" with "speak" and "listen" with "hear")
-(*NOTE* the functions which will replace the old ones, (In this example, speak and hear), Must exist already. As such, it is advised that you either ensure that the module holding theese functions are loaded first [*see, required functions, Step six*] or that you have defined theese functions within your own module.
+	*NOTE*	The persist function will execute at regular intervals (typically 30 minutes), There is currently no alternative to this bar creating your own.
 
+5) Local files that are to be retained when updating the module version using the updater program:
+	module.dont_overwrite([{"file 1/2/etc..."}])
 
---- Step eight ---	CONDITIONAL
-If the module requires function(s) to be executed at shutdown, startup, or continuously, use one or more of the following code snippets:
-Start:		module.startup([{"first func"},{"etc..."}])
-Shutdown:	module.shutdown([{"first func"},{"etc..."}])
-Persistent:	module.persist([{"first func"},{"etc..."}])
+	Information:
+	{"file 1/2/etc..."}		The file(s) that (is/are) to be kept
 
-Information:
-{"first func"}			-The name of your module's functions that are to be executed at one or more of startup, shutdown, continuously
+	Ie:
+	module.dont_overwrite(["reminders.txt"])
+	-or- (in the event of multiple)
+	module.dont_overwrite(["Journaldata_one.txt","Journaldata_two.txt"])
 
-for example:
-module.startup([launchui])
-module.shutdown([closeui])
+-For example:
+def setup():
+    module.module("reminders","0.2.01","N/A")
+    module.dont_overwrite("reminders.txt")
+    module.startup([loadreminders])
+    module.shutdown([savereminders])
 
-(This tells the VPA to run the "launchui" function at startup, and the "closeui" function at shutdown)
-(*NOTE* the persist function does not execute functions continuously, but at regular (10-60 minute) intervals)
-(*NOTE* The persist, startup and shutdown functions must lie inside of a random function, such that they will not be executed on initialisation due to the way that python handles functions. There is no currently known way around this)
+(snippet taken from reminders module, LOaBIS version 0.2.01 (but you could've figured that out if you'd just read the above tutorial))
 
-
---- Step nine ---	RECOMENDED
-Add in the code snippet bellow to tell the VPA updater that some files will need not be overwritten:
-module.dont_overwrite({"file 1"},{"etc..."})
-
-Information:
-{"file 1"}			- The name of the first file that shouldn't be overwritten
-
-for example:
-module.dont_oberwrite("reminders.txt")
-(This tells the updater to not overwrite the file "reminders.txt" when updating the module version.
-
---- Step ten ---	RECOMENDED
-create a zip archive for your module, such that the archive looks as following:
-
--Reminders 0.2.00.zip
+--- Step Six ---	RECOMENDED STRONGLY
+Create a zip archive for the module, such that the file layout is:
+-Reminders 0.13.8.zip
    |
    |- reminders
        |
        |- __init__.py
        |- reminders.txt
+       |- commands.txt
 
-(This is to allow the correct installation of the module, and as such it is required to right click on the folder and create a zip file there)
-(*NOTE* THIS MUST BE A ZIP FILE)
+*NOTES*
+1) This *MUST* (without exception) be a zip file, not a Rar or other format.
+2) The version number of this modules release *MUST* (without exception) be in the title.	(This is the developmental version number of THE MODULE, not of the LOaBIS install it was created using)
+3) The module code *MUST* (without exception) be contained in a folder in the zip file.
+4) This is to allow correct installation of the module using the updater program.
 
---- Step eleven ---	RECOMENED
-save this zip archive to an online file hosting system, and contact the developers of the VPA with the url of the file, as well as a short summary of the module and a developer name
-This will allow the updater program to find versions of your module and run automati updates on it:
+--- Step Seven ---	RECOMENDED
+Save the Zip file above to an online repository, preferably dropbox (as this is the only tested file hosting system as of version 0.2.02) and contact either myself (Jack) or Luke with the url, The developer name/alias (It's a nice feature That I personally enjoy) and a short description of the module.
+(This will allow us to add your module url to the LOaBIS module repository so that the Updater may find and download it.
 
 for example:
 https://www.dropbox.com/s/9ckpjwdxc6tvuff/queries%200.1.62.zip?dl=0		This is the url of the 0.1.62 version.
 https://www.dropbox.com/sh/tb8srfhnbbpz615/AACCJd003A3IYFSBa1V3--OJa?dl=0	This is the URL of the Queries Module. THIS IS THE ONE WE WANT!
 
-(*NOTE* due to how data is handeled on websites, We have only been able to get this working for dropbox, However, we are working hard to get this running for other popular file hosting sites as well!)
+*NOTES*
+1) My email is: lloydwaltersj@gmail.com, add LOaBIS module idea, or something to that effect, in the subject header.
+	(You may contact Luke through: sluke570@gmail.com)
+	(Or alternatively, find me on a social media platform if you think email is out of date. I'll almost certainly be the only "Jack Lloyd-Walters" You can find on there.)
+2) There will also be an (as of current) upcoming wizard that will allow you to automatically send me your module,
+	This will be able to do it from the updater, or the standalone
+3) Currently, Dropbox is the only supported repository, however I (and sometimes luke) are working to fix this.
+	(Our current target is GDrive)
+4) Though it is unlikely to happen, I certainly will not accept every module.
+	Only those that pose no security nor welfare risk are to be accepted.
+	If your module does not comply with this, Ie: it allows malicious code acces, it is malicious code, or will act innapropriately for the user, I WILL NOT GREENLIGHT YOUR MODULE.
+	(Yes, I will *Personally* read through your modules and check what is happening beneath the surface).
+	Anyway, I'm sure none of you will do that, But It's good to have a disclaimer, right?
 
+--- Step Eight ---	CONDITIONAL	- Provided you have created an online repository
+Create two files (changelog.txt and metadata.txt) and save them in the top level of the online repository created in step seven (Provided you have done step seven)
+These files *MUST* be named "metadata" and "changelog" in lowercase, and *MUST* be text files.
+These files are for use of the Updater, and will be used to provide more information about your module, such as author name, short description, required modules, update info, etc...
 
---- Step twelve ---	RECOMENDED
-add you module to your VPA version to test that everything works, and enjoy, knowing you've developed a module for the program
+The metadata file should include, in any prefered order:
+	name:{"Module Name"}
+	screenname:{"Module Screen Name"}
+	author:{"Your Developer Name"}
+	description:{"Module Description"}
+	homepage:{"Your Homepage"}
+
+	Information:
+	{"Module Name"}				- This is used to double check that this file is correct. If the name here is not the same as the module name, your module WILL NOT BE LOADED by the Updater
+	{"Module Screen Name"}			- This is the name that the Updater will display, use this if you want to have a different name shown from the {"Module Name"} (For whatever reason)
+	{"Your Developer Name"}			- Whatever you want to be know as, This can be your name, or an alias.
+	{"Module Description"}			- A short (or long) summary of what your module will do. this may be different from the description provided in step seven, as this description will be the one displayed on the Updater. If there are any profanities, I will remove your module and you will have to reapeal its addition to Updater. (I will however, give you up to a weeks notice to rectify the issues)
+	{"Your Homepage"}			- Do you have a website or codebase to show of your skills? Feel free to use this tag to shamelessly advertise yourself! I'd be happy to promote you. Though, If there are any... undesireable links, I will remove your module and you will have to reapeal its addition to Updater. (I will however, give you up to a weeks notice to rectify the issues)
+
+	-For example:
+	name:reminders
+	screenname:Loabis Reminders module
+	author:Jack (Skiy)
+	description:A module to provide reminding functionality to Loabis. Can create helpfull notes at specific times and give warnings in advanced.
+
+The changelog file should contain:
+	{"Module version"}:	-	{"Optional Update name"}
+	minversion:{"Minimum working version"}
+	maxversion:{"Maximum working version"}
+	required:{"Required Modules"}
+	{"Aditional details"}
+
+	Information:
+	{"Module version"}			- This is the header that denotes the version of the module (See LOaBIS Patch_Notes.txt or LOaBIS changelog.txt for details (The name was Patch_Notes in older versions))
+	{"Minimum working version"}		- This is the minimum compatable LOaBIS version that this module is known to work with. (Typically, but not always the current LOaBIS Version)
+	{"Maximum working version"}		- Same as above, except this is the maximum compatable LOaBIS Version. (Obviously it can't be compatable with 100% certainty of an unreleased version)
+	{"Required Modules"}			- Any aditional LOaBIS modules that are required for this to work. The same as the section on module.hasdependancy(). In this case, use N/A if there are no dependancies.
+	{"Aditional details"}			- The aditional informtaion about this version, things added/changed/etc...
+	{"optional Update name"}		- If the update has a name, add it here. If it doesn't, then you can skip this
+	*See the LOaBIS changelog for a clearer instruction.
+
+	-For example:
+	0.1.8:		- Conflict Update	- The version tag for advanced_ui 0.1.8 (a little obvious, but it's good to clear ambiguity)
+	minversion:0.2.01
+	maxversion:0.2.02
+	required:uitools
+	Fixed a load of bugs where the ui would not load correctly if uitools encountered a loading error
+	Fixed the incompatability for betterui, should now prevent that loading if installed (advanced_ui is the successor to the simpler basicui)
+	Some light code cleanup
+
+	[Taken from the unreleased 0.1.8 version of advanced_ui, and the unreleased uitools requirement]
+	*NOTES*
+	Only minversion,maxversion and required *HAVE* to be in this file. everything else is to be added at your own discretion
+	The above example only documents a single version tag. This file *MUST* include a tag for every version, released or otherwise
+
+*I don't have a website to advertise myself, so I've left the homepage tag out.
+
+--- Step Nine ---	ENTIRELY OPTIONAL
+Add your module to LOaBIS using the Updater (step seven pending) or copy-paste and enjoy.
+(would also recomend installing other modules from the updater, and either playing around with them, or just seeing how they work and what neat tricks you can learn from their developers.)
+
+====================
+
+Happy Programing People, Enjoy whatever weird and wonderful things you create.
+I look forward to seeing and adding your modules to LOaBIS.
+	-Jack Lloyd-Walters.	(Skiy)	(This time my alias was last. Hah!)
+	(Head Programer and concept creator.)
+
+P.s.
+Hello again dear reader (or replace with your prefered name I should call you), this time at the bottom rather than the top of the document.
+quite a long read, wasn't it? Co-incidentally this document is larger than the core programming of LOaBIS, and nearly three quaters of it's entire (current) codebase! Woah, am-I-right?
+Anyway, If you need help, there are three options:
+1) Look at other modules
+2) Wait for the module maker wizard I'll maybe eventually write
+3) Contact me (email or otherwise) (I leave this step last, as it'll take the most time. also actuall contact with people *shudders*. Nah, I'm kidding, I'm sure you're fine)
+You know, Though a little one sided, this was a nice chat. Anyway, See ya.
+
+====================

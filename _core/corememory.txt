@@ -17,23 +17,28 @@ import sys
  threading
  datetime
  os
-from time import sleep
+ time
+ subprocess
 def _say(text=""):
     for x in "System: "+str(text)+"\n":
         sys.stdout.write(x)
-        sleep(0.003)
+        time.sleep(0.003)
 def _logtext(text="null"):
     y = open("log.txt"
 a)
     y.write("["+str(datetime.datetime.now())+"] - "+text[0].upper()+text[1:len(text)]+"\n")
     y.close()
-def getmem(text=""
-coremem=[]):
-    if not text[0] == "<":
-        text = "<"+text+">"
-    if not coremem:
-        coremem = getcoredata()
-    return coremem[coremem.index(text)+1:coremem.index("</"+text[1:len(text)])]
+def startsoftware():
+    coremem = getcoredata()
+    for x in ["\n"]+getmem("logo"
+coremem):
+        say(x)
+    say((getmem("software"
+coremem))[0]+"\nVersion "+corever+" developed by "+str(getmem("development"
+coremem)[0]).split("\t")[0])
+    while not globals()["Shutdown"]:
+        getcom(listen("\nWhat would you like to do?"))
+        
 def getcom(text=""):
     text+=" "
     for x in module.cwords:
@@ -42,6 +47,9 @@ def getcom(text=""):
             break
     _logtext("Function: "+x.replace(" "
 )+" requested by user")
+    if x.replace(" "
+) == "closesoftware":
+        globals()["Shutdown"] = True
     try:
         globals()[x.replace(" "
 )](text.replace(x
@@ -51,14 +59,12 @@ def getcom(text=""):
         _logtext("Could not perform function: "+str(x)+"\nError: "+str(type(e))+"; "+str(e))
         say("The function
  "+str(x)+" could not be executed\n")
-    if not x.replace(" "
-) == "closesoftware":
-        getcom(listen("What would you like to do?"))
 if __name__ == "__main__":
     try:
         start_time = datetime.datetime.now()
         _logtext("Initialising Software")
         _say("Initialising Software")
+        globals()["Shutdown"] = False
         modules = next(os.walk(os.getcwd()))[1]
         modules.sort()
         if "__pycache__" in modules:
@@ -70,9 +76,11 @@ if __name__ == "__main__":
         init()
         corever = getmodinfo("_core")[1]
         _logtext("Core version: "+corever+" Loaded")
-        stable = 0
-        unstable = 0
-        not_inst = []
+        stable
+unstable
+not_inst = 0
+0
+[]
         _logtext("Checking module dependancies")
         _say("Checking module dependancies")
         a = modules
@@ -94,8 +102,9 @@ x)
         _say("Loading modules")
         for x in modules:
             a = getmodinfo(x)
-            modver = a[1]
-            needed = a[3]
+            modver
+needed = a[1]
+a[3]
             b = simver(corever
 modver)
             if b != 0:
@@ -112,12 +121,9 @@ modver])
             else:
                 not_inst.append(x)
                 modules.pop(modules.index(x))
-        if stable:
-            _logtext(str(stable)+" stable Modules loaded")
-        if unstable:
-            _logtext(str(unstable)+" Unstable Modules loaded")
-        if not_inst:
-            _logtext(str(len(not_inst))+" Modules prevented from loading: "+str(not_inst))
+        _logtext(str(stable)+" stable Modules loaded")
+        _logtext(str(unstable)+" Unstable Modules loaded")
+        _logtext(str(len(not_inst))+" Modules prevented from loading: "+str(not_inst))
         _say(str(stable+unstable)+" Modules loaded
  "+str(len(not_inst))+" Modules prevented from loading")
         import_start = datetime.datetime.now()
@@ -218,23 +224,18 @@ z[9]
         if module.persistfunc:
             _logtext("Starting "+str(len(module.persistfunc))+" persistent functions; "+str(module.persistfunc))
             _say("Starting up "+str(len(module.persistfunc))+" persistent functions")
-            ##WRITE CODE HERE TO RUN PERSISTENT FUNCTIONS> Please
+            pers = threading.Thread(name="Persistent functions"
+target=lambda:subprocess.call(["python"
+persistent.py
+module.persistfunc]
+creationflags = subprocess.CREATE_NEW_CONSOLE))
+            pers.start()
         elapsed_time = divmod((datetime.datetime.now()-start_time).total_seconds()
 60)
         _logtext("Import successfull
  took "+str(elapsed_time[0]*60+elapsed_time[1])+" seconds")
         _say("Software initialised")
-        print()
-        coremem = getcoredata()
-        for x in getmem("logo"
-coremem):
-            print(x)
-        say((getmem("software"
-coremem))[0])
-        say("Version "+corever+" developed by "+str(getmem("development"
-coremem)[0]).split("\t")[0])
-        print()
-        getcom(listen("What would you like to do?"))
+        startsoftware()
         
     except Exception as e:
         _logtext("Software aborted unexpectedly
