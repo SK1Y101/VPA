@@ -1,94 +1,80 @@
-try:
-    from _core import settings
-except:
-    import settings
-import subprocess,datetime
+import subprocess, sys, datetime
+from time import sleep
+globals()["funcs"] = []
+globals()["cwords"] = []
+globals()["desc"] = []
+globals()["startfunc"] = []
+globals()["persistfunc"] = []
+globals()["permods"] = []
+globals()["shutdownfunc"] = []
 
-def init():
-    x = str(subprocess.check_output("pip list",shell=True))
+def module(name="",version="",url=""):
+    return True
+    #used to define the module version. URL not required, but for some reason i like to have it anyway.
+
+def needs(modules=[]):
+    return True
+    #used to set a list of pythonic modules that a LOaBIS module requires
+
+def startup(funcs=[]):
+    return True
+    #used to set a list of functions that must be performed at launch
+
+def shutdown(funcs=[]):
+    return True
+    #used to set a list of functions to be execeuted at shutdown.
+
+def persist(funcs=[]):
+    return True
+    #used to set a list of functions that will be performed at regular intervals
+
+def hasdependancy(mods=[]):
+    return True
+    #used to set a list of LOaBIS functions that must be loaded before itself
+
+def dont_overwrite(files=[]):
+    return True
+    #required bu the updater to prevent it replacing data files.
+
+def _logtext(text="null"):
+    y = open("log.txt","a")
+    y.write("["+str(datetime.datetime.now())+"] - "+text[0].upper()+text[1:len(text)]+"\n")
+    y.close()
+
+def getmods():
+    x = str(subprocess.check_output("pip3 list",shell=True))
     x = x[2:len(x)-1]
-    modules = []
+    mods = []
     while ")" in x:
         x = x[0:x.index("(")-1]+"\n"+x[x.index(")")+5:len(x)]
     while "\n" in x:
-        modules.append(x[0:x.index("\n")])
+        mods.append(x[0:x.index("\n")])
         x = x[x.index("\n")+1:len(x)]
-    settings.addglobal("modules",modules,True)
-    settings.addglobal("dont_inst",[],True)
-
-def logtext(text="null"):
-    text = text[0].upper()+text[1:len(text)]+"\n"
-    y = open("log.txt","a")
-    y.write("["+str(datetime.datetime.now())+"] - "+text)
-    y.close()
-    
-def installmodule(mod=""):
-    print("Installing module: "+mod+" Please wait a moment")
-    logtext("module: "+mod+" not installed, installing now")
-    subprocess.call("pip install "+str(mod),shell=True)
-    init()
-    if mod in settings.modules:
-        logtext("module: "+mod+" installed")
-        return True
-    else:
-        logtext("module: "+mod+" could not be installed")
-        return False
-
-def checkmodule(mod="",core="",inst=True):
-    if not mod in settings.modules:
-        if inst == True:
-            x = installmodule(mod)
-            if x == False:
-                stopmodule(core,mod)
-                return False
-            else:
-                return True
-        else:
-            logtext("module: "+mod+" could not be installed")
-            stopmodule(core,mod)
-            return False
-    else:
-        return True
-
-def stopmodule(core="",mod=""):
+    globals()["Mods"] = mods
+    return mods
+            
+def checkmods(modules=[]):
     try:
-        print("Instalation of module: "+mod+" Failed, "+core+" will not be loaded")
-        settings.dont_inst.append(core)
-        logtext("No module: "+mod+" has prevented loading of functions: "+a)
+        if len(Mods) == 0:
+            getmods()
     except:
-        pass
-
-def replacefunction(core="",mod="",new_mod=""):
-    print("It almost worked")
-    if hasattr(core,str(mod)):
-        print("It worked")
-        setattr(core,mod,new_mod)
-        return True
-    else:
-        return False
-
-def needsdependancies(mod="",req=[]):
-    for x in reg:
-        if not x in settings.modules:
-            logtext("Dependancy: "+x+" has prevented "+mod+" from loading")
-            settings.dont_inst.append(mod)
-        else:
-            exec("from "+str(x)+" import *")
-
-def modversion(mod="",ver="",url=""):
-    if not settings.version == ver:
-        if mod != "_core":
-            logtext("Version outdated: "+mod+" Needed: "+ver+", VPA version: "+settings.version)
-            print(mod+" outdated, update module or download correct version from: "+url)
-            vpapatch = str(settings.version)[0:len(str(settings.version))-1]
-            modpatch = str(ver)[0:len(str(ver))-1]
-            if vpapatch == modpatch:
-                logtext("Module: "+mod+" Loaded. Equivalent patch versions may be unstable (VPA: "+vpapatch+", "+mod+": "+modpatch+")")
-            else:
-                settings.dont_inst.append(mod)
-
-def dont_overwrite(file=""):
+        getmods()
+    for x in modules:
+        x = x.replace(" ","")
+        if x not in Mods:
+            if not installmodule(x):
+                return False
     return True
 
-if __name__ != "__main__":
-    init()
+def installmodule(mod=""):
+    _logtext("Module: "+mod+" not installed, installing now")
+    if sys.platform == "win32":
+        subprocess.call("pip3 install "+str(mod),shell=True)
+    else:
+        subprocess.call("sudo pip3 install "+str(mod),shell=True)
+    if mod in getmods():
+        _logtext("module: "+mod+" installed")
+        return True
+    else:
+        _logtext("module: "+mod+" could not be installed")
+        return False

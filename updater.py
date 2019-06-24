@@ -44,12 +44,12 @@ def openDir(dird=""):
 def getVPAversion(dird=""):
     try:
         if dird != "":
-            f = open(dird+"\\_core\\corememory.txt","r")
+            f = open(dird+"\\_core\\__init__.py","r")
         else:
-            f = open(def_dir+"\\_core\\corememory.txt","r")
-        y = f.read().split("\n")
+            f = open(def_dir+"\\_core\\__init__.py","r")
+        y = f.read()
         f.close()
-        return y[y.index("version number")+1]
+        return (y.split("module.module(")[1].split(")")[0].replace('"',"").split(","))[1]
     except:
         return "0.0.00"
 
@@ -70,8 +70,7 @@ def getversions():
         f = open(x,"r")
         y = f.read()
         f.close()
-        z = y[y.index("modversion")+len("modversion"):y.index(")")+1]
-        z = z.replace("(","").replace(")","").replace('"',"").split(",")
+        z = y.split("module.module(")[1].split(")")[0].replace('"',"").split(",")
         mem.append(z[0])
         mem.append(z[1])
         mem.append(z[2])

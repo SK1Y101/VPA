@@ -1,6 +1,6 @@
-goodbye :goodbye,shut the program down.
-exit :goodbye,exit the program.
-quit :goodbye,exit the program.
-help :showhelp,displays a quick overview of uniquie functions that are available
-fullhelp :showfullhelp,displays a quick overview of every function available.
-resetpip :resetpip,clear all pip modules.
+goodbye :closesoftware,Terminates the program safely, saving data.
+quit :closesoftware,Terminates the program safely, saving data.
+exit :closesoftware,Terminates the program safely, saving data.
+closesoftware :closesoftware,Terminates the program safely, saving data.
+help :showhelp,displays a quick overview of unique functions that are available.
+help_full :showfullhelp,displays a quick overview of EVERY function available.

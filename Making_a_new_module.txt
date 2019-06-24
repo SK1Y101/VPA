@@ -1,0 +1,133 @@
+This document gives a basic breakdown of the construction of a custom made module
+Make sure to follow the steps as consicely as possible if you are uncertain as to the process.
+Any steps that state "CONDITIONAL" are not strictly required. make sure to check the text if this applies to your module.
+any steps that state "RECOMENDED" are CONDITIONAL steps, but are very much recomended for you to undertake for the ease of everyone.
+Have fun, I look forward to your contribution to the VPA functionality!
+	- Developer Skiy (Jack Lloyd-Walters).
+	*side note, Very few things have imaginitive names, so you'll probably quess how to do things without this document, But I'd recomend reading it anyway.
+
+--- Step one ---
+a) create the folder for your module and place it in the same directory as LOaBIS.py.
+b) add the following two files to the folder:
+	__init__.py	- This allows python to recognise that the folder you have just created contains loadable scripts
+	commands.txt	- This allows the program to recognise functions from your script.
+
+
+--- Step two ---
+Create your script. It dosen't have to be, but it is recomended to write it in the __init__.py file you created earlier.
+
+
+--- Step three ---
+open commands.txt and append all of the user functions to the file, in the following format (ommiting the curly brackets and speech marks)
+{"text to call function"} :{"name of function"},{"short description"}		(The space before the colon is no strictly required, but recomended nonetheless)
+
+Information:
+{"text to call function"}	- This is what the user will enter in the interface to call the function.
+{"name of function"}		- This is the name of the function that will be called in your script.
+{"short description"}		- A breif summary of what the function does, such that the user will be able to tell when they call for help.
+
+for example:
+help :showhelp,Displays a quick overview of what functions are available, and their purpose.
+(this will allow the user to type in "help" to activate the "showhelp" function
+
+
+--- Step four ---
+append to the begining of __init__.py, the module identifier, which allows programs such as the updater/installer and the main program to identify it:
+module.module({"Module folder name"},{"Module applicable version"},{"Module URL"})
+
+Information:
+{"Module folder name"}		- This is the name of the folder, this is generally also the name of the module.
+{"Module applicable version"}	- This is the version of the VPA that the module was written for.
+{"Module URL"}			- Though not strictly neccesary, this is the URL of th module version location.
+
+for example:
+module.module("_core","0.2.00","N/A")
+(This tells the VPA that this module is _core, for VPA version 0.2.00, but does not have an applivable URL)
+
+
+--- Step five ---	CONDITIONAL
+If the module requires a pythonic module, not included in the default package, make sure to include the required code at the start of __init__.py
+module.needs([{"function"},{"function no.2"},{"etc..."}])
+
+Information:
+{"function"} / {"function no.2"}- The Pip name of the required function that is needed for the correct useage of the module.
+
+for example:
+module.needs([wolframalpha,six])
+(This will check if the pythonic modules "wolframalpha" and "six" are installed)
+
+
+--- Step six ---	CONDITIONAL
+Similar to step five, if there are any VPA modules that are required for the function of your module(s), use the following code to instruct the program of such:
+module.hasdependancy([{"VPA func. 1"},{"VPA func. 2"},{"etc..."}])
+
+Information:
+{"VPA func. 1"}/{"VPA func. 2"}	- the name of the VPA functions that must be loaded for this module to work
+
+for example:
+module.hasdependancy([uitools,betterui])
+(This tells the VPA that this module must be loaded after (and only after) the two modules "uitools" and "betterui" have been loaded, in order to satisfy the dependancy)
+
+
+--- Step seven ---	CONDITIONAL
+If the module requires one of its own functions to replace that of another module, use the following code
+
+*EDIT* As of the 0.2.00 update, this functionality was removed in order to be re-written for the new version. Hang tight!
+
+
+
+--- Step eight ---	CONDITIONAL
+If the module requires function(s) to be executed at shutdown, startup, or continuously, use one or more of the following code snippets:
+Start:		module.startup([{"first func"},{"etc..."}])
+Shutdown:	module.shutdown([{"first func"},{"etc..."}])
+Persistent:	module.persist([{"first func"},{"etc..."}])
+
+Information:
+{"first func"}	-The name of your module's functions that are to be executed at one or more of startup, shutdown, continuously
+
+for example:
+module.startup([launchui])
+module.shutdown([closeui])
+
+(This tells the VPA to run the "launchui" function at startup, and the "closeui" function at shutdown)
+(*NOTE* the persist function does not execute functions continuously, but at regular (10-60 minute) intervals)
+(*NOTE* The persist, startup and shutdown functions must lie inside of a random function, such that they will not be executed on initialisation due to the way that python handles functions. There is no currently known way around this)
+
+
+--- Step nine ---	RECOMENDED
+Add in the code snippet bellow to tell the VPA updater that some files will need not be overwritten:
+module.dont_overwrite({"file 1"},{"etc..."})
+
+Information:
+{"file 1"}	- The name of the first file that shouldn't be overwritten
+
+for example:
+module.dont_oberwrite("reminders.txt")
+(This tells the updater to not overwrite the file "reminders.txt" when updating the module version.
+
+--- Step ten ---	RECOMENDED
+create a zip archive for your module, such that the archive looks as following:
+
+-Reminders 0.2.00.zip
+   |
+   |- reminders
+       |
+       |- __init__.py
+       |- reminders.txt
+
+(This is to allow the correct installation of the module, and as such it is required to right click on the folder and create a zip file there)
+(*NOTE* THIS MUST BE A ZIP FILE)
+
+--- Step eleven ---	RECOMENED
+save this zip archive to an online file hosting system, and contact the developers of the VPA with the url of the file, as well as a short summary of the module and a developer name
+This will allow the updater program to find versions of your module and run automati updates on it:
+
+for example:
+https://www.dropbox.com/s/9ckpjwdxc6tvuff/queries%200.1.62.zip?dl=0		This is the url of the 0.1.62 version.
+https://www.dropbox.com/sh/tb8srfhnbbpz615/AACCJd003A3IYFSBa1V3--OJa?dl=0	This is the URL of the Queries Module. THIS IS THE ONE WE WANT!
+
+(*NOTE* due to how data is handeled on websites, We have only been able to get this working for dropbox, However, we are working hard to get this running for other popular file hosting sites as well!)
+
+
+--- Step twelve ---	RECOMENDED
+add you module to your VPA version to test that everything works, and enjoy, knowing you've developed a module for the program

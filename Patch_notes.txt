@@ -1,6 +1,20 @@
+0.2.0: -The "let's rewrite the whole codebase before we miss the opportunity to do so" Update-
+Rewrote the entire program from scratch, should make it easier to debug and optimise, as well as for greater ease in the development of UI modules (see startup code and functional replacement for more details)
+added in new persistant timed code, where functions can be executed automatically at regular intervals.
+*note, the persistent code has not currently been enabled, and has been ommited from this version to halt the introduction of more pottential unnesecary bugs.
+added in new startup code, where modules can execut functions at the initialisation of the program.
+Rewrote how to make a module with the newest version, checking still required.
+Probably introduced a metric Fuck ton of new bugs, we'll soon see.
+Removed the ability to overwrite functions, this will be re-added in an upcoming update for the newest version.
+Removed the unneccesary _core/settings module
+Removed the creation of global variables across the whole script (this will also be re-added in future)
+slightly modified the Updater.py script, such that it will work with the new version (This will also be re-written at a later date)
+Not much else, rewriting everything took a while. (as though the largest update log is "Not much")
+Added in a lot more attempts at humour and witiness in the patch notes. Not quite sure it's a good idea.
+
 0.1.62:
 modified the _core.getcom module to ease troublshooting the program.
-_cire.showhelp function added, thus should fulfil the role of the older _core.help.
+_core.showhelp function added, thus should fulfil the role of the older _core.help.
 _core.help now only displays user functions that have different system functions asigned to them.
 
 0.1.61:

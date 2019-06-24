@@ -1,177 +1,197 @@
-import sys,os,csv,datetime,importlib,random
-from _core import module
+import csv,sys,datetime,os,random
+from . import module
 from time import sleep
-module.modversion("_core","0.1.62","url")
-module.dont_overwrite(["log.txt","UpdaterData.txt"])
 
-def startup():
-    from _core import settings,module
-    _say("\n-- | Inintialising Startup Procedure | --")
-    try:
-        settings.addglobal("user",str(os.getlogin()[0].upper()+os.getlogin()[1:len(os.getlogin())]),True)
-    except:
-        settings.addglobal("user","User",True)
-    settings.addglobal("self",'"'+str(os.path.basename(sys.argv[0]))+'"',True)
-    settings.addglobal("mem",[],True)
-    settings.addglobal("corepass",'"corepass"',True)
-    settings.addglobal("cwords",[],True)
-    settings.addglobal("funcs",[],True)
-    settings.addglobal("desc",[],True)
-    settings.addglobal("software",'""',True)
-    settings.addglobal("version",'""',True)
-    settings.addglobal("funcsatshutdown",[])
-    try:
-        y = settings.modules
-        x = settings.dont_inst
-        fas = settings.funcsatshutdown
-        importlib.reload(settings)
-    except:
-        importlib.reload(settings)
-    try:
-        settings.modules = y
-        settings.dont_inst = x
-        settings.funcsatshutdown = fas
-    except:
-        module.init()
-        
-    readmemory()
-    checkbackup()
-    software = settings.software
-    version = settings.version
-    _say("-- | startup completed succesfully | --\n-- Initialising at time: "+str(datetime.datetime.now())+" --\n"+software+" "+version+"\n")
-    logtext("starting "+software+" version "+version)
-    
-def logtext(text="null"):
-    text = text[0].upper()+text[1:len(text)]+"\n"
-    y = open("log.txt","a")
-    y.write("["+str(datetime.datetime.now())+"] - "+text)
-    y.close()
+def main():
+    module.module("_core","0.2.00","N/A")
+    module.startup([checkbackup])
 
-def checkbackup():
-    logtext("Checking backup")
-    self = settings.self
-    mem = settings.mem
-    _say("-- Checking Core --")
-    f = open("_core/corememory.txt","r")
-    m = f.read()
-    f.close()
-    codecore = m[m.index("backup")+7:len(m)]
-    _say("-- Comparing Core with backup --")
-    f = open(self,"r")
-    me = f.read()
-    f.close()
-    if me != codecore:
-        logtext("Core modified, requesting pass")
-        if _listen("Core pass required:\n> ") !=settings.corepass:
-            say("-- Restoring Core --")
-            f = open(self,"w")
-            f.write(codecore)
-            f.close()
-            _say("-- Core Restored to backup version --")
-            logtext("Core restored to backup")
-            sys.exit()
-        else:
-            _say("-- Manual overwrite of Core --")
-            logtext("core overwritten")
-            writebackup()
-    else:
-        _say("-- No errors encountered --")
-        logtext("Core backup check complete")
-
-def writebackup():
-    logtext("Writing core backup")
-    mem = settings.mem
-    self = settings.self
-    _say("-- Reading self --")
-    f = open(self,"r")
-    m = f.read()
-    f.close()
-    t = mem.index("backup")
-    mem = mem[0:t+1]
-    mem.append(str(m)[0:len(str(m))-1])
-    _say("-- Preparing Core for backup --")
-    f = open("_core/corememory.txt","w")
-    for x in mem:
-        f.write(str(x)+"\n")
-    f.close()
-    _say("-- Core backup complete --")
-    logtext("core backup complete")
-
-def readmemory():
-    logtext("Reading memory")
-    _say("-- Initialising memory retrieval --")
-    f = open("_core/corememory.txt","r")
-    file = csv.reader(f)
-    mem = []
-    for row in file:
-        mem = mem+row
-    settings.addglobal("mem",mem,True)
-    f.close()
-    _say("-- memory retrieval complete --")
-    settings.software = str(mem[mem.index("software name")+1])
-    settings.version = str(mem[mem.index("version number")+1])
-    try:
-        user = mem[mem.index(str(os.getlogin()[0].upper()+os.getlogin()[1:len(os.getlogin())]))+1]
-    except:
-        user = "User"
-    logtext("Memory loaded")
-    
-def _say(text=""):
-    for x in str(text)+"\n":
-        sys.stdout.write(x)
-        sleep(0.003)
+def init():
+    globals()["coremem"] = []
+    globals()["self"] = str(os.path.basename(sys.argv[0]))
 
 def say(text=""):
     for x in str(text)+"\n":
         sys.stdout.write(x)
         sleep(0.003)
 
-def _listen(text=""):
-    for x in str(text):
+def _say(text=""):
+    for x in str(text)+"\n":
         sys.stdout.write(x)
         sleep(0.003)
-    text = input()
-    return text
 
 def listen(text=""):
-    for x in str(text):
+    for x in str(text)+"\n> ":
         sys.stdout.write(x)
-        sleep(0.003)
-    text = input()
-    return text
-
-def goodbye(text=""):
-    say("-- Quiting... Saving data... --")
-    for x in settings.funcsatshutdown:
-        try:
-            try:
-                exec("from .. import "+str(x.split(".")[0]))
-            except:
-                try:
-                    exec("from . import "+str(x.split(".")[0]))
-                except:
-                    exec("import "+str(x.split(".")[0]))
-            try:
-                exec(str(x.split(".")[0]).replace("()","")+"()")
-            except:
-                exec(str(x).replace("()","")+"()")
-        except Exception as inst:
-            logtext("ERROR IN CODE EXECUTION:\n--------------------\n"+str(type(inst))+"\n-"+str(inst)+"\nDon't do ^That until the developers can fix it.\n--------------------")
-    settings.addglobal("funcsatshutdown",[],True)
-    writebackup()
-    say("-- Shutdown complete, goodbye --")
-    logtext("Closing software\n")
+    return input()
 
 def showhelp(text=""):
-    say("commands: description\n(Some functions have been ommitted due to shared functionality, to see all functions, type fullhelp)")
-    for x in range(len(settings.cwords)):
-        if settings.funcs.index(settings.funcs[settings.cwords.index(settings.cwords[x])]) == x:
-            say(settings.cwords[x]+": "+settings.desc[x])
+    if module.cwords:
+        say("commands: description\n(Some functions have been ommitted due to shared functionality, to see all functions, type fullhelp)")
+        for x in range(len(module.cwords)):
+            if module.funcs.index(module.funcs[module.cwords.index(module.cwords[x])]) == x:
+                say(module.cwords[x]+": "+module.desc[x])
+    else:
+        say("No functions available to show help!")
 
 def showfullhelp(text=""):
-    say("commands: description")
-    for x in range(len(settings.cwords)):
-        say(settings.cwords[x]+": "+settings.desc[x])
+    if module.cwords:
+        say("commands: description")
+        for x in range(len(module.cwords)):
+            say(module.cwords[x]+": "+module.desc[x])
+    else:
+        say("No functions available to show help!")
+
+def _logtext(text="null"):
+    text = text[0].upper()+text[1:len(text)]+"\n"
+    y = open("log.txt","a")
+    y.write("["+str(datetime.datetime.now())+"] - "+text)
+    y.close()
+    
+def getdata(filepath=""):
+    f = open(str(filepath),"r")
+    file = csv.reader(f)
+    mem = []
+    for row in file:
+        mem +=row
+    f.close()
+    return mem
+
+def savedata(filepath="",data=[]):
+    mem =""
+    for x in data:
+        mem = mem+x+"\n"
+    f = open(str(filepath),"w")
+    f.write(mem)
+    f.close()
+
+def getmodinfo(module=""):
+    try:
+        f = open(str(module)+"/__init__.py")
+        m = f.read()
+        f.close()
+        name,ver,url = m.split("module.module(")[1].split(")")[0].replace('"',"").split(",")
+        mods,startup,persist,depend,shutdown = [],[],[],[],[]
+        try:
+            if not name == "_core":
+                mods = m.split("module.needs([")[1].split("])")[0].replace('"',"").split(",")
+        except:
+            mods = []
+        try:
+            if not name == "_core":
+                depend = m.split("module.hasdependancy([")[1].split("])")[0].replace('"',"").split(",")
+        except:
+            depend = []
+        try:
+            startup = m.split("module.startup([")[1].split("])")[0].replace('"',"").split(",")
+        except:
+            startup = []
+        try:
+            if not name == "_core":
+                persist = m.split("module.persist([")[1].split("])")[0].replace('"',"").split(",")
+        except:
+            persist = []
+        try:
+            if not name == "_core":
+                shutdown = m.split("module.shutdown{[")[1].split("])")[0].replace('"',"").split(",")
+        except:
+            shutdown = []
+        return name,ver,url,mods,depend,startup,persist,shutdown
+    except:
+        return module,"0.0.00","None",[],[],[],[],[]
+
+def simver(corever="",modver=""):
+    if corever == modver:
+        return 1
+    elif (corever.split(".")[1] == modver.split(".")[1]) and (corever.split(".")[2][0] == modver.split(".")[2][0]):
+        return 2
+    else:
+        return 0
+
+def checkdata(data=[]):
+    tempdata=[]
+    for x in data:
+        tempdata.append(str(x))
+    from collections import Counter
+    _logtext("Checking "+str(len(tempdata))+" data lists")
+    out = Counter(tempdata).most_common(1)[0][0]
+    _logtext("Data entry "+str(tempdata.index(out))+" returned as suspected true value")
+    return data[tempdata.index(out)]
+
+def getcoredata():
+    try:
+        _logtext("Retreiving core data files")
+        try:
+            globals()["coremem"] = getdata("_core/corememory.txt")
+        except:
+            globals()["coremem"] = getdata("corememory.txt")
+        _logtext("Data core retrieval complete")
+    except:
+        _logtext("An issue occured loading data, using temporary backup")
+        globals()["coremem"] = []
+    return coremem
+
+def checkbackup():
+    if len(coremem) == 0:
+        getcoredata()
+    _logtext("Retrieving backup")
+    _say("Retrieving core backup")
+    try:
+        codecore = coremem[coremem.index("<backup>")+1:coremem.index("</backup>")]
+    except:
+        codecore = getdata(self)
+        _logtext("No core backup available")
+    _logtext("Comparing core to backup")
+    me = getdata(self)
+    if me != codecore:
+        _logtext("Modified core detected, requesting pass")
+        if input("Corepass required:\n> ") != "LOaBIS":
+            f = open(self,"w")
+            for x in codecore:
+                f.write(x)
+            f.close()
+            _logtext("Core restored to backup version")
+            sys.exit()
+        else:
+            _logtext("Core overwrite authorised")
+            writebackup()
+    else:
+        _logtext("Core backup check complete")
+    _say("Core backup check complete")
+    
+def writebackup():
+    _logtext("Writing core backup")
+    _say("Writing core backup")
+    if len(coremem) == 0:
+        getcoredata()
+    me = getdata(self)
+    _logtext("Updating backup with core")
+    if "<backup>" in coremem:
+        mem = coremem[0:coremem.index("<backup>")+1]+me+coremem[coremem.index("</backup>"):len(coremem)]
+    else:
+        mem = coremem+["<backup>"]+me+["</backup>"]
+    _logtext("writing backups")
+    savedata("_core/corememory.txt",mem)
+    mem = []
+    _logtext("Core backup complete")
+    _say("Core backup complete")
+
+def closesoftware(text=""):
+    print()
+    start_time = datetime.datetime.now()
+    _logtext("Shutting down software")
+    _logtext("Checking shutdown functions")
+    if module.shutdownfunc:
+        _say("Performing shutdown functions")
+        for x in module.shutdownfunc:
+            a = 1
+        _logtext("Shutdown functions completed")
+    else:
+        _logtext("No shutdown functions required")
+    writebackup()
+    elapsed_time = divmod((datetime.datetime.now()-start_time).total_seconds(),60)
+    _logtext("shutdown completed successfully, took "+str(elapsed_time[0]*60+elapsed_time[1])+" seconds\n")
+    _say("Shutdown completed successfully, you may now quit the program safely")
 
 def encrypt(text="",key="`"):
     y=""
@@ -213,27 +233,3 @@ def encrypttofile(file="",m=[],pas=""):
     f = open(file,"w")
     f.write(encrypt(y[:-4],file+pas))
     f.close()
-
-def resetpip(text=""):
-    import subprocess
-    logtext("user has selected to remove pip modules")
-    x = str(subprocess.check_output("pip list",shell=True))
-    x = x[2:len(x)-1]
-    not_inst = []
-    modules = []
-    while ")" in x:
-        x = x[0:x.index("(")-1]+"\n"+x[x.index(")")+5:len(x)]
-    while "\n" in x:
-        modules.append(x[0:x.index("\n")])
-        x = x[x.index("\n")+1:len(x)]
-
-    modules.pop(modules.index("pip"))
-    modules.pop(modules.index("setuptools"))
-    modules.pop(modules.index("virtualenv"))
-        
-    if listen("Are you sure you wish to remove pip modules?\n> ").lower() in ["yes","y"]:
-        for x in modules:
-            logtext("Uninstalling: "+x)
-            say("uninstalling: "+x)
-            subprocess.call("pip uninstall "+str(x))
-        say("Pip modules uninstalled, You will have to close the software to prevent major system erros")
