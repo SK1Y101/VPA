@@ -1,12 +1,14 @@
+0.1.55:
+Small Optimisation Fixes.
+Fixed some more errors raised by Updater. Hopefully theese will be the last problems to arise.
+Slightly modified the _core.help module to not display different functions that perform the same purpose.
+
 0.1.54:
 Fixed many of the issues that escaped us in 0.1.53.
 Fixed some of the problems from trying to fix the problems in 0.1.53.
 Began some light work on the updater to do with modular differentiation. Nothing too big, else there will be more errors.
 Bagan a new VPA Patch to stop the patch notes fpr 0.1.53 being too long.
 Fixed some errors ascociated with bad zipfile handling.
-Removed Log and UpdaterData from distribution.
-Fixed overwrite error in Log.
-Fixed error where updater would not recognise a new version of the VPA.
 
 0.1.53:	-The "Let's fix all of the Bugs we introduced in the previous three updates!" update-
 Contiued to add functionality to the updater.

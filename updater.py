@@ -341,7 +341,7 @@ def updatever(name="",latestver="",url=""):
             logtext("Unsuported filetype for: "+name+" v."+latestver+" @ "+url)
         elif (".rar" not in url) and (".zip" not in url):
             print("Unsuported filetype")
-        logtext("Unsuported filetype for: "+name+" v."+latestver+" @ "+url)
+            logtext("Unsuported filetype for: "+name+" v."+latestver+" @ "+url)
     except Exception as inst:
         logtext("ERROR IN CODE EXECUTION:\n--------------------\n"+str(type(inst))+"\n-"+str(inst)+"\nDon't do ^That until the developers can fix it.\n--------------------")
         #from tkinter import messagebox

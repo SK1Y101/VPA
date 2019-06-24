@@ -1,7 +1,7 @@
 import sys,os,csv,datetime,importlib
 from _core import module
 from time import sleep
-module.modversion("_core","0.1.54","url")
+module.modversion("_core","0.1.55","url")
 module.dont_overwrite(["log.txt","UpdaterData.txt"])
 
 def startup():
