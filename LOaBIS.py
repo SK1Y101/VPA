@@ -6,6 +6,7 @@ def getcom(text=""):
         if x in text:
             x = settings.funcs[settings.cwords.index(x)]
             break
+    logtext("Function: "+x.replace(" ","")+" requested by user")
     try:
         globals()[x.replace(" ","")](text.replace(x,"").replace(settings.cwords[settings.funcs.index(x)],""))
     except Exception as inst:

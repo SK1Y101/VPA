@@ -1,3 +1,8 @@
+0.1.62:
+modified the _core.getcom module to ease troublshooting the program.
+_cire.showhelp function added, thus should fulfil the role of the older _core.help.
+_core.help now only displays user functions that have different system functions asigned to them.
+
 0.1.61:
 added a new _core function that allows modules to execute certain functionalities on shutdown as well as startup.
 discontinued work on overwriting the main VPA functions -took too many resources and could destroy functionality.
