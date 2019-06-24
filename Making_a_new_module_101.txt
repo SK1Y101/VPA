@@ -42,7 +42,7 @@ if module.checkmodule(["pipname of the module"],["VPA module name"]) == True:
     import ["module"]
 
 ["pipname of the module"]	 - the name you would type into the cmd to install the module using pip: 	i.e.: "SpeechRecognition"
-["module"] 			- the name you would type into the oython editor to load te python module: 	i.e.: "import speech_recognition"
+["module"] 			- the name you would type into the python editor to load te python module: 	i.e.: "import speech_recognition"
 ["VPA module name"] 		- the name of the VPA module this is inside of: 				i.e.: "betterui"
 
 for example:
@@ -125,6 +125,7 @@ Add the module to the updater program repositry by contacting the current person
 ie:
 'could you add my module, queries, which is at "https://drive.google.com/queries/"'
 
+Note! Currently we can only load files from dropbox (As that is the file platform we have been using), for installation of modules from elsewhere, please allow some time for the developers to fix this.
 ---
 
 step twelve: (Optional, Only for if you want the modules to automatically be updated)
@@ -137,8 +138,14 @@ Ie:
   |- 0.1.31.zip
   etc...
 
+Note! Currently we can only load Zip archives (As that is the most suported filetype), for installation of modules via other means (Such as RAR), please allow some time for the developers to fix this.
+
 ---
 
 step thirteen:
 place the folder containing the module in the main directory, the same as another module labeled "_core".
 DO NOT EVER REMOVE, MODIFY OR TAMPER WITH EITHER THE CORE FOLDER, ITS CONTENTS NOR LOABIS.PY - THEESE ARE REQUIRED FOR THE USUAL FUNCTION OF THE PROGRAM
+
+-- OR --
+
+If the module has been added to the VPA module repository, install it via the Updater.py program.

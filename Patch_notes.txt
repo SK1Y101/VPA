@@ -1,3 +1,13 @@
+0.1.53:	-The "Let's fix all of the Bugs we introduced in the previous three updates!" update-
+Contiued to add functionality to the updater.
+Fixed an isse with updater not being able to show previous versions of modules.
+Fixed an issue where the updater would constantly ping the module database.
+Fixed several runtime errors with the updater, namely those caused when downloading a zip archive.
+Modified module.modversion to allow it to load modules that have an equivalent patch version as the currently running VPA.
+Fixed problems that arose when trying to update VPA.
+Fixed some issues where the program attempted to check local versions of modules that didnt exist yet.
+Log now actually shows all of the usefull data to debug the program.
+
 0.1.52:
 Fixed most of the errors that escaped undetected from 0.1.51
 Added some small adjustments to Updater.py
@@ -71,8 +81,8 @@ Optimisation.
 
 0.0.3:
 Initial development restarted.
-Program is now not ine huge chunk of code.
-Program ca actually do stuff and is somewhat readable.
+Program is now not one huge chunk of code.
+Program can actually do stuff and is somewhat readable.
 Really buggy stuff that basically never worked renamed to "experimental features".
 
 0.0.2:

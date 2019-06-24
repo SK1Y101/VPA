@@ -76,9 +76,14 @@ def needsdependancies(mod="",req=[]):
 def modversion(mod="",ver="",url=""):
     if not settings.version == ver:
         if mod != "_core":
-            logtext("Version outdated: "+mod+" Needed "+ver+", VPA version: "+settings.version)
+            logtext("Version outdated: "+mod+" Needed: "+ver+", VPA version: "+settings.version)
             print(mod+" outdated, update module or download correct version from: "+url)
-            settings.dont_inst.append(mod)
+            vpapatch = str(settings.version)[0:len(str(settings.version))-1]
+            modpatch = str(ver)[0:len(str(ver))-1]
+            if vpapatch == modpatch:
+                logtext("Module: "+mod+" Loaded. Equivalent patch versions may be unstable (VPA: "+vpapatch+", "+mod+": "+modpatch+")")
+            else:
+                settings.dont_inst.append(mod)
 
 def dont_overwrite(file=""):
     return True

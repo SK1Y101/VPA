@@ -12,8 +12,9 @@ def init():
             logtext("No default directory found, opening wizard")
             startup()
         else:
-            main()
             logtext("Starting Module Updater")
+            globals()["vpadirectory"] = removeextension(data[data.index("default_directory")+1])
+            main()
     except Exception as inst:
         logtext("ERROR IN CODE EXECUTION:\n--------------------\n"+str(type(inst))+"\n-"+str(inst)+"\nDon't do ^That until the developers can fix it.\n--------------------")
 
@@ -142,12 +143,12 @@ def initialload():
     else:
         core_update = "-"
 
-    if core_update!="-":
-        b = Button(ml,text=core_update,command=lambda n="core",l=latestcorever,ldl=latetscoredl: updatever(n,l,ldl)).grid(row=1,column=1,sticky=W+E)
+    if core_update !="-":
+        b = Button(ml,text=core_update,command=lambda n="_core",l=latestcorever,ldl=latestcoredl: updatever(n,l,ldl)).grid(row=1,column=1,sticky=W+E)
     else:
         b = Button(ml,text=core_update,state=DISABLED).grid(row=1,column=1,sticky=W+E)
         
-    b = Button(ml,text="VPA Core",command=lambda n="core",l=latestcorever,v=online_version: onnameclick(n,l,v),state=DISABLED).grid(row=1,column=2,sticky=W+E)
+    b = Button(ml,text="VPA Core",command=lambda n="_core",l=latestcorever,v=online_version: onnameclick(n,l,v),state=DISABLED).grid(row=1,column=2,sticky=W+E)
     b = Button(ml,text=local_version,state=DISABLED).grid(row=1,column=3,sticky=W+E)
     b = Button(ml,text=latestcorever,state=DISABLED).grid(row=1,column=4,sticky=W+E)
 
@@ -197,10 +198,13 @@ def updatetable():
             b = Button(ml,text=updates,command=lambda n=name,l=latestver,ldl=latetsverdl: updatever(n,l,ldl)).grid(row=x+2,column=1,sticky=W+E)
         else:
             b = Button(ml,text=updates,state=DISABLED).grid(row=x+2,column=1,sticky=W+E)
-            
+        if installedver == "0.0.00":
+            instvertext = "-"
+        else:
+            instvertext = installedver
         versions = module_versions[2*x+1]
         b = Button(ml,text=name,command=lambda n=name,l=latestver,v=versions: onnameclick(n,l,v)).grid(row=x+2,column=2,sticky=W+E)
-        b = Button(ml,text=installedver,state=DISABLED).grid(row=x+2,column=3,sticky=W+E)
+        b = Button(ml,text=instvertext,state=DISABLED).grid(row=x+2,column=3,sticky=W+E)
         b = Button(ml,text=latestver,state=DISABLED).grid(row=x+2,column=4,sticky=W+E)
         progress.step(1)
         #use "command=lambda: ["function"](x, y, z, ...)" to pass variables into a function.
@@ -234,7 +238,10 @@ def openurl(url=""):
     subprocess.call("start "+url,shell=True)
     
 def onnameclick(name="",latestver="",vers=""):
-    installedver = local_modules[local_modules.index(name)+1]
+    try:
+        installedver = local_modules[local_modules.index(name)+1]
+    except:
+        installedver = "-"
     url = online_modules[online_modules.index(name)+1]
     
     popup = Toplevel()
@@ -270,6 +277,7 @@ def instalver(v="",vers="",name=""):
     updatever(name,vertoinst,url.replace("?dl=0","?dl=1"))
 
 def updatever(name="",latestver="",url=""):
+    print(name,latestver,url)
     import zipfile, urllib.request, shutil
     progress.configure(maximum=4)
     y=0
@@ -277,7 +285,7 @@ def updatever(name="",latestver="",url=""):
         if ".zip" in url:
             file_name = vpadirectory.replace("/","\\")+"\\"+"Temp.zip"
             logtext("Fetching data from "+url)
-            with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+            with urllib.request.urlopen(url.replace("?dl=0","?dl=1")) as response, open(file_name, 'wb') as out_file:
                 ptext.set("Collecting "+name+".zip")
                 progress.step()
                 y+=1
@@ -286,17 +294,20 @@ def updatever(name="",latestver="",url=""):
                 progress.step()
                 y+=1
             logtext("Checking overwrite conflicts")
-            f = open(name+str("//__init__.py"),"r")
-            overwrites = f.read()
-            f.close()
             old_files = ""
-            if "module.dont_overwrite([" in overwrites:
-                old_files = ((m.split("module.dont_overwrite([")[1]).split("])")[0]).replace('"',"").split(",")
-            tempfiles = []
-            for x in old_files:
-                f = open(name+"//"+x,"r")
-                tempfiles.append(f.read())
+            try:
+                f = open(name+str("//__init__.py"),"r")
+                overwrites = f.read()
                 f.close()
+                if "module.dont_overwrite([" in overwrites:
+                    old_files = ((m.split("module.dont_overwrite([")[1]).split("])")[0]).replace('"',"").split(",")
+                tempfiles = []
+                for x in old_files:
+                    f = open(name+"//"+x,"r")
+                    tempfiles.append(f.read())
+                    f.close()
+            except:
+                logtext("No local version of "+name+" found")
             logtext("Extracting "+name)
             zip_file = zipfile.ZipFile(str(file_name.replace("\\","\\\\").replace("/","\\\\")),"r")
             zip_file.extractall()
@@ -311,11 +322,25 @@ def updatever(name="",latestver="",url=""):
             logtext("Updating "+name)
             progress.step()
             y+=1
-            versions = module_versions[int(module_versions.index(name)/2)+1]
-            b = Button(ml,text="-",state=DISABLED).grid(row=int(module_versions.index(name)/2+1),column=1,sticky=W+E)
-            b = Button(ml,text=name,command=lambda n=name,l=latestver,v=versions: onnameclick(n,l,v)).grid(row=int(module_versions.index(name)/2+1),column=2,sticky=W+E)
-            b = Button(ml,text=latestver,state=DISABLED).grid(row=int(module_versions.index(name)/2+1),column=3,sticky=W+E)
-            b = Button(ml,text=latestver,state=DISABLED).grid(row=int(module_versions.index(name)/2+1),column=4,sticky=W+E)
+            if name == "_core":
+                latestcorever,latestcoredl = (online_version[len(online_version)-1])[0].replace(".rar","").replace(".zip",""),(online_version[len(online_version)-1])[1]
+                if latestcorever > local_version:
+                    core_update = "available"
+                else:
+                    core_update = "-"
+                if core_update !="-":
+                    b = Button(ml,text=core_update,command=lambda n="_core",l=latestcorever,ldl=latestcoredl: updatever(n,l,ldl)).grid(row=1,column=1,sticky=W+E)
+                else:
+                    b = Button(ml,text=core_update,state=DISABLED).grid(row=1,column=1,sticky=W+E)
+                b = Button(ml,text="VPA Core",command=lambda n="_core",l=latestcorever,v=online_version: onnameclick(n,l,v),state=DISABLED).grid(row=1,column=2,sticky=W+E)
+                b = Button(ml,text=local_version,state=DISABLED).grid(row=1,column=3,sticky=W+E)
+                b = Button(ml,text=latestcorever,state=DISABLED).grid(row=1,column=4,sticky=W+E)
+            else:
+                versions = module_versions[int(module_versions.index(name)/2)+1]
+                b = Button(ml,text="-",state=DISABLED).grid(row=int(module_versions.index(name)/2+2),column=1,sticky=W+E)
+                b = Button(ml,text=name,command=lambda n=name,l=latestver,v=versions: onnameclick(n,l,v)).grid(row=int(module_versions.index(name)/2+2),column=2,sticky=W+E)
+                b = Button(ml,text=latestver,state=DISABLED).grid(row=int(module_versions.index(name)/2+2),column=3,sticky=W+E)
+                b = Button(ml,text=latestver,state=DISABLED).grid(row=int(module_versions.index(name)/2+2),column=4,sticky=W+E)
             logtext("Updated "+name)
         elif ".rar" in url:
             print("Not yet implemented")
@@ -349,7 +374,7 @@ def getVPAdirectory():
         for x in range(len(dire)):
             if dire[len(dire)-x-1] == "/":
                 break
-        logtext("Directory found, "+str(dire[0:len(dire)-x-1].replace("/","\\"),dire[len(dire)-x:len(dire)],getVPAversion(dire[0:len(dire)-x])))
+        logtext("Directory found, "+str(dire[0:len(dire)-x-1].replace("/","\\"))+str(dire[len(dire)-x:len(dire)])+str(getVPAversion(dire[0:len(dire)-x])))
         return dire[0:len(dire)-x-1].replace("/","\\"),dire[len(dire)-x:len(dire)],getVPAversion(dire[0:len(dire)-x])
     except:
         return None
@@ -473,6 +498,16 @@ def startup():
     globals()["mini"] = Tk()
     mini.title("select VPA install")
 
+    menubar = Menu(mini)
+    filemenu = Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Forget VPA Install", command=removedir)
+    filemenu.add_command(label="Rename VPA Install", command=renamedir)
+    filemenu.add_command(label="Add New VPA Install", command=addnewdir)
+    filemenu.add_command(label="Select VPA Install", command=selectinstall)
+    menubar.add_cascade(label="File", menu=filemenu)
+    menubar.add_command(label="Help", command=helpwindow)
+    mini.config(menu=menubar)
+
     globals()["w"] = BooleanVar()
     def_button = Checkbutton(mini,text="Set as default",variable=w)
     
@@ -536,7 +571,7 @@ def launchVPA():
     else:
         file_name = vpadirectory+"\\LOaBIS.py"
     master.destroy()
-    logtext("Updater terminated, Executing VPA")
+    logtext("Updater terminated, Executing VPA\n")
     os.system(file_name)
 
 def applychanges():
@@ -555,6 +590,12 @@ def applychanges():
 def installmods(installmods=""):
     for x in installmods:
         updatever(x[0],x[1],x[2])
+
+def helpwindow():
+    '''helpbox = Tk()
+    helpbox.title("Help")
+    '''
+    donothing()
 
 def main():
     globals()["mods_to_inst"] = []
@@ -579,7 +620,7 @@ def main():
     settingmenu.add_command(label="Installer settings",command=donothing)
     menubar.add_cascade(label="Settings", menu=settingmenu)
 
-    menubar.add_command(label="Help", command=donothing)
+    menubar.add_command(label="Help", command=helpwindow)
 
     master.config(menu=menubar)
     
