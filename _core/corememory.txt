@@ -1,5 +1,5 @@
 version number
-0.1.53
+0.1.54
 developer
 Jack Lloyd-Walters
 Luke Skinner

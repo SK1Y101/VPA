@@ -121,7 +121,7 @@ ie:
 ---
 
 step eleven: (Optional, Only for if you want the modules to automatically be updated)
-Add the module to the updater program repositry by contacting the current person maintaining the thread, and sending them the name of your module, and the file link to its folder repository.
+Add the module to the updater program repositry by contacting the current person maintaining the thread, and sending them the name of your module, Your chosen authur name and any accreditation, and the file link to its folder repository.
 ie:
 'could you add my module, queries, which is at "https://drive.google.com/queries/"'
 

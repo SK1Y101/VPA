@@ -277,7 +277,6 @@ def instalver(v="",vers="",name=""):
     updatever(name,vertoinst,url.replace("?dl=0","?dl=1"))
 
 def updatever(name="",latestver="",url=""):
-    print(name,latestver,url)
     import zipfile, urllib.request, shutil
     progress.configure(maximum=4)
     y=0
@@ -310,7 +309,7 @@ def updatever(name="",latestver="",url=""):
                 logtext("No local version of "+name+" found")
             logtext("Extracting "+name)
             zip_file = zipfile.ZipFile(str(file_name.replace("\\","\\\\").replace("/","\\\\")),"r")
-            zip_file.extractall()
+            zip_file.extractall(path=vpadirectory.replace("/","\\"))
             zip_file.close()
             os.remove(file_name)
             ptext.set(name+" Extracted, Updating")
@@ -324,17 +323,12 @@ def updatever(name="",latestver="",url=""):
             y+=1
             if name == "_core":
                 latestcorever,latestcoredl = (online_version[len(online_version)-1])[0].replace(".rar","").replace(".zip",""),(online_version[len(online_version)-1])[1]
-                if latestcorever > local_version:
-                    core_update = "available"
-                else:
-                    core_update = "-"
-                if core_update !="-":
-                    b = Button(ml,text=core_update,command=lambda n="_core",l=latestcorever,ldl=latestcoredl: updatever(n,l,ldl)).grid(row=1,column=1,sticky=W+E)
-                else:
-                    b = Button(ml,text=core_update,state=DISABLED).grid(row=1,column=1,sticky=W+E)
+                core_update = "-"
+                b = Button(ml,text=core_update,state=DISABLED).grid(row=1,column=1,sticky=W+E)
                 b = Button(ml,text="VPA Core",command=lambda n="_core",l=latestcorever,v=online_version: onnameclick(n,l,v),state=DISABLED).grid(row=1,column=2,sticky=W+E)
-                b = Button(ml,text=local_version,state=DISABLED).grid(row=1,column=3,sticky=W+E)
+                b = Button(ml,text=latestcorever,state=DISABLED).grid(row=1,column=3,sticky=W+E)
                 b = Button(ml,text=latestcorever,state=DISABLED).grid(row=1,column=4,sticky=W+E)
+                master.title("Module instalation - VPA "+latestcorever+" -- "+str(vpadirectory))
             else:
                 versions = module_versions[int(module_versions.index(name)/2)+1]
                 b = Button(ml,text="-",state=DISABLED).grid(row=int(module_versions.index(name)/2+2),column=1,sticky=W+E)
@@ -344,10 +338,10 @@ def updatever(name="",latestver="",url=""):
             logtext("Updated "+name)
         elif ".rar" in url:
             print("Not yet implemented")
-            logtext("Unsuported filetype for: "+name+" v."+latestver+" @ Url")
-        else:
+            logtext("Unsuported filetype for: "+name+" v."+latestver+" @ "+url)
+        elif (".rar" not in url) and (".zip" not in url):
             print("Unsuported filetype")
-            logtext("Unsuported filetype for: "+name+" v."+latestver+" @ Url")
+        logtext("Unsuported filetype for: "+name+" v."+latestver+" @ "+url)
     except Exception as inst:
         logtext("ERROR IN CODE EXECUTION:\n--------------------\n"+str(type(inst))+"\n-"+str(inst)+"\nDon't do ^That until the developers can fix it.\n--------------------")
         #from tkinter import messagebox
@@ -382,12 +376,22 @@ def getVPAdirectory():
 def getdata(file=""):
     import csv
     mem = []
-    f = open(file,"r")
-    file = csv.reader(f)
-    for row in file:
-        mem.append(row[0])
-    f.close()
-    return mem
+    try:
+        f = open(file,"r")
+        file = csv.reader(f)
+        for row in file:
+            if row != []:
+                mem.append(row[0])
+        f.close()
+        if mem == []:
+            return ["default_directory","None","<directories>","</directories>"]
+        else:
+            return mem
+    except FileNotFoundError:
+        f = open(file,"w")
+        f.write("default_directory\nNone\n<directories>\n</directories>")
+        f.close()
+        return ["default_directory","None","<directories>","</directories>"]
 
 def savedata(file="UpdaterData.txt"):
     f = open(file,"w")
