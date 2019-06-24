@@ -49,7 +49,10 @@ def getVPAversion(dird=""):
             f = open(def_dir+"\\_core\\__init__.py","r")
         y = f.read()
         f.close()
-        return (y.split("module.module(")[1].split(")")[0].replace('"',"").split(","))[1]
+        try:
+            return (y.split("module.module(")[1].split(")")[0].replace('"',"").split(","))[1]
+        except:
+            return (y.split("module.modversion(")[1].split(")")[0].replace('"',"").split(","))[1]
     except:
         return "0.0.00"
 
@@ -70,7 +73,10 @@ def getversions():
         f = open(x,"r")
         y = f.read()
         f.close()
-        z = y.split("module.module(")[1].split(")")[0].replace('"',"").split(",")
+        try:
+            z = y.split("module.module(")[1].split(")")[0].replace('"',"").split(",")
+        except:
+            z = y.split("modue.modversion(")[1].split(")")[0].replace('"',"").split(",")
         mem.append(z[0])
         mem.append(z[1])
         mem.append(z[2])
@@ -367,7 +373,7 @@ def getVPAdirectory():
         for x in range(len(dire)):
             if dire[len(dire)-x-1] == "/":
                 break
-        logtext("Directory found, "+str(dire[0:len(dire)-x-1].replace("/","\\"))+str(dire[len(dire)-x:len(dire)])+str(getVPAversion(dire[0:len(dire)-x])))
+        logtext("Directory found, "+str(dire[0:len(dire)-x-1].replace("/","\\"))+"\\"+str(dire[len(dire)-x:len(dire)])+" Version "+str(getVPAversion(dire[0:len(dire)-x])))
         return dire[0:len(dire)-x-1].replace("/","\\"),dire[len(dire)-x:len(dire)],getVPAversion(dire[0:len(dire)-x])
     except:
         return None
@@ -493,7 +499,7 @@ def selectinstall():
         savedata()
         vpadirectory = removeextension((data[dirselect+data.index("<directories>")+1]).split(";")[2])
         mini.destroy()
-        logtext("New install, "+vpadirectory+" Selected for use")
+        logtext("New install, "+vpadirectory+"/LOaBIS.py Selected for use")
         main()
 
 def startup():

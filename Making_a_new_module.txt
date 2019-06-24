@@ -71,9 +71,16 @@ module.hasdependancy([uitools,betterui])
 
 --- Step seven ---	CONDITIONAL
 If the module requires one of its own functions to replace that of another module, use the following code
+module.replacefunction([{"old func.1"},{"etc..."}],[{"new func.1"},{"etc..."}])
 
-*EDIT* As of the 0.2.00 update, this functionality was removed in order to be re-written for the new version. Hang tight!
+Information:
+{"old func.1"}			-The old function which is to be replaced
+{"new func.1"}			-The new function which it is to be replaced with
 
+for example:
+module.replacefunction([say,listen],[speak,hear])
+(This will replace the function "say" with "speak" and "listen" with "hear")
+(*NOTE* the functions which will replace the old ones, (In this example, speak and hear), Must exist already. As such, it is advised that you either ensure that the module holding theese functions are loaded first [*see, required functions, Step six*] or that you have defined theese functions within your own module.
 
 
 --- Step eight ---	CONDITIONAL
@@ -83,7 +90,7 @@ Shutdown:	module.shutdown([{"first func"},{"etc..."}])
 Persistent:	module.persist([{"first func"},{"etc..."}])
 
 Information:
-{"first func"}	-The name of your module's functions that are to be executed at one or more of startup, shutdown, continuously
+{"first func"}			-The name of your module's functions that are to be executed at one or more of startup, shutdown, continuously
 
 for example:
 module.startup([launchui])
@@ -99,7 +106,7 @@ Add in the code snippet bellow to tell the VPA updater that some files will need
 module.dont_overwrite({"file 1"},{"etc..."})
 
 Information:
-{"file 1"}	- The name of the first file that shouldn't be overwritten
+{"file 1"}			- The name of the first file that shouldn't be overwritten
 
 for example:
 module.dont_oberwrite("reminders.txt")

@@ -34,7 +34,11 @@ def hasdependancy(mods=[]):
 
 def dont_overwrite(files=[]):
     return True
-    #required bu the updater to prevent it replacing data files.
+    #required by the updater to prevent it replacing data files.
+
+def replacefunction(funcs=[],replacement=[]):
+    return True
+    #this is used to allow the overwritting of one funcion to another
 
 def _logtext(text="null"):
     y = open("log.txt","a")

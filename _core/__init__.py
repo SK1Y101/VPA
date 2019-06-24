@@ -3,7 +3,7 @@ from . import module
 from time import sleep
 
 def main():
-    module.module("_core","0.2.00","N/A")
+    module.module("_core","0.2.01","N/A")
     module.startup([checkbackup])
 
 def init():
@@ -16,7 +16,7 @@ def say(text=""):
         sleep(0.003)
 
 def _say(text=""):
-    for x in str(text)+"\n":
+    for x in "System: "+str(text)+"\n":
         sys.stdout.write(x)
         sleep(0.003)
 
@@ -71,7 +71,7 @@ def getmodinfo(module=""):
         m = f.read()
         f.close()
         name,ver,url = m.split("module.module(")[1].split(")")[0].replace('"',"").split(",")
-        mods,startup,persist,depend,shutdown = [],[],[],[],[]
+        mods,startup,persist,depend,shutdown,old,new = [],[],[],[],[],[],[]
         try:
             if not name == "_core":
                 mods = m.split("module.needs([")[1].split("])")[0].replace('"',"").split(",")
@@ -93,12 +93,19 @@ def getmodinfo(module=""):
             persist = []
         try:
             if not name == "_core":
-                shutdown = m.split("module.shutdown{[")[1].split("])")[0].replace('"',"").split(",")
+                shutdown = +m.split("module.shutdown([")[1].split("])")[0].replace('"',"").split(",")
         except:
             shutdown = []
-        return name,ver,url,mods,depend,startup,persist,shutdown
+        try:
+            if not name == "_core":
+                replaced = m.split("module.replacefunction([")[1].split("])")[0].replace('"',"").replace(",[","").replace("[","")
+                old,new = replaced.split("]")[0].split(","),replaced.split("]")[1].split(","),
+        except:
+            old,new = [],[]
+                
+        return name,ver,url,mods,depend,startup,persist,shutdown,old,new
     except:
-        return module,"0.0.00","None",[],[],[],[],[]
+        return module,"0.0.00","None",[],[],[],[],[],[],[]
 
 def simver(corever="",modver=""):
     if corever == modver:

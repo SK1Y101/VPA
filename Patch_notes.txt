@@ -1,4 +1,10 @@
-0.2.0: -The "let's rewrite the whole codebase before we miss the opportunity to do so" Update-
+0.2.01:
+Modified the updater script such that it would still work with the older file heirarchy and layout
+slight modifications to the inbuilt printing, logging, and command execution functions
+Fixed module.replacefunction such that it now works. (previosuly there was an attribute error, however a new method has been utilised to great effect)
+some attempts at optimisation.
+
+0.2.00: -The "let's rewrite the whole codebase before we miss the opportunity to do so" Update-
 Rewrote the entire program from scratch, should make it easier to debug and optimise, as well as for greater ease in the development of UI modules (see startup code and functional replacement for more details)
 added in new persistant timed code, where functions can be executed automatically at regular intervals.
 *note, the persistent code has not currently been enabled, and has been ommited from this version to halt the introduction of more pottential unnesecary bugs.

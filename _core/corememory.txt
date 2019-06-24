@@ -19,7 +19,7 @@ import sys
  os
 from time import sleep
 def _say(text=""):
-    for x in str(text)+"\n":
+    for x in "System: "+str(text)+"\n":
         sys.stdout.write(x)
         sleep(0.003)
 def _logtext(text="null"):
@@ -106,7 +106,8 @@ modver)
                     else:
                         unstable+=1
                 else:
-                    not_inst.append(x)
+                    not_inst.append([x
+modver])
                     modules.pop(modules.index(x))
             else:
                 not_inst.append(x)
@@ -117,7 +118,8 @@ modver)
             _logtext(str(unstable)+" Unstable Modules loaded")
         if not_inst:
             _logtext(str(len(not_inst))+" Modules prevented from loading: "+str(not_inst))
-        _say(str(len(not_inst))+" Modules prevented from loading")
+        _say(str(stable+unstable)+" Modules loaded
+ "+str(len(not_inst))+" Modules prevented from loading")
         import_start = datetime.datetime.now()
         modules.insert(0
 _core)
@@ -148,56 +150,75 @@ r)
         module.funcs.append("null")
         module.cwords.append("null")
         module.desc.append("a null function")
-        _logtext("Retrieving startup functions")
-        _say("Retrieving startup functions")
-        a = 0
+        _logtext("Retrieving modification functions")
+        _say("Checking modification functions")
+        a
+b=[0
+0
+0
+0]
+[0
+0
+0
+0]
+        offlimits = ["getcom"
+_logtext
+_say
+checkbackup
+writebackup]
         for x in modules:
-            start = getmodinfo(x)[5]
+            z = getmodinfo(x)
+            start
+end
+persist
+old
+new = z[5]
+z[7]
+z[6]
+z[8]
+z[9]
             if start:
-                a+=1
+                b[0]+=1
                 for y in start:
-                    module.startfunc.append(y)                
+                    module.startfunc.append(y)
+                    a[0]+=1
+            if end:
+                b[1]+=1
+                for y in end:
+                    a[1]+=1
+                    module.shutdownfunc.append(y)
+            if persist:
+                b[2]+=1
+                for y in persist:
+                    a[2]+=1
+                    module.persistfunc.append(y)
+            if old:
+                b[3]+=1
+                for y in range(len(old)):
+                    a[3]+=1
+                    if not old[y] in offlimits:
+                        globals()[old[y]] = globals()[new[y]]
+                        
+        _logtext("Modification functions retrieved")
+        _say("Modification functions retrieved")
+        _logtext(str(a[0])+" Startup functions loaded from "+str(b[0])+" modules")
+        _logtext(str(a[1])+" shutdown functions loaded from "+str(b[1])+" modules")
+        _logtext(str(a[2])+" persistent functions loaded from "+str(b[2])+" modules")
+        _logtext(str(a[3])+" replacement functions loaded from "+str(b[3])+" modules")
+                     
         if module.startfunc:
-            _say(str(len(module.startfunc))+" Startup functions located
- executing")
-            _logtext(str(len(module.startfunc))+" Startup functions loaded from "+str(a)+" modules")
+            _logtext("Executing "+str(len(module.startfunc))+" Startup functions; "+str(module.startfunc))
+            _say(str(len(module.startfunc))+" Startup functions located")
             for x in module.startfunc:
                 try:
                     globals()[str(x)]()
                 except Exception as e:
                     _logtext("Could not perform startup function: "+str(x)+"\nError: "+str(type(e))+"; "+str(e))
-        else:
-            _logtext("No startup functions required")
-        _logtext("Retrieving shutdown functions")
-        _say("Retrieving shutdown functions")
-        a = 0
-        for x in modules:
-            shutdown = getmodinfo(x)[7]
-            if shutdown:
-                a+=1
-                for y in shutdown:
-                    module.shutdownfunc.append(y)                
-        if module.startfunc:
-            _logtext(str(len(module.shutdownfunc))+" Shutdown functions loaded from "+str(a)+" modules")
-        else:
-            _logtext("No shutdown functions required")
-            
-        _logtext("Retrieving persistent functions")
-        _say("Retrieving persistent functions")
-        a = 0
-        for x in modules:
-            pers = getmodinfo(x)[6]
-            if pers:
-                a+=1
-                module.permods.append(x)
-                for y in pers:
-                    module.persistfunc.append(y)
+                 
         if module.persistfunc:
+            _logtext("Starting "+str(len(module.persistfunc))+" persistent functions; "+str(module.persistfunc))
             _say("Starting up "+str(len(module.persistfunc))+" persistent functions")
-            _logtext(str(len(module.startfunc))+" Persistent functions loaded from "+str(a)+" modules")
             ##WRITE CODE HERE TO RUN PERSISTENT FUNCTIONS> Please
-        else:
-            _logtext("No persistent functions loaded")
         elapsed_time = divmod((datetime.datetime.now()-start_time).total_seconds()
 60)
         _logtext("Import successfull
@@ -208,9 +229,9 @@ r)
         for x in getmem("logo"
 coremem):
             print(x)
-        _say((getmem("software"
+        say((getmem("software"
 coremem))[0])
-        _say("Version "+corever+" developed by "+str(getmem("development"
+        say("Version "+corever+" developed by "+str(getmem("development"
 coremem)[0]).split("\t")[0])
         print()
         getcom(listen("What would you like to do?"))
